@@ -9,8 +9,14 @@ if __name__ == '__main__':
     # load all the problems from path
     pl = ProblemList()
     pl.load_from_path(opt.dset, opt.count, opt.split, opt.ratio)
+    
+    # tree gen
 
-    # Save the problems solution in the s310582.py file
+    # algorithm
+
+    # plotting & Draw best solution
+
+    # save the problems solution in the s310582.py file
     saver = Saver(opt.out, opt.name, opt.id)
     for problem in pl.problems:
         saver.append_solution(problem)

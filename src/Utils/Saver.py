@@ -1,4 +1,4 @@
-from ProblemLoader import Problem
+from Utils.ProblemLoader import Problem
 
 class Saver:
     base_path : str

@@ -1,6 +1,6 @@
-import ArgParser as ap
-from ProblemLoader import ProblemList
-from Saver import Saver
+import Utils.ArgParser as ap
+from Utils.ProblemLoader import ProblemList
+from Utils.Saver import Saver
 
 #!/usr/bin/python3
 if __name__ == '__main__':

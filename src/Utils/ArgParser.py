@@ -1,3 +1,10 @@
+# ------------------------------------------------------
+# This code is licensed under the MIT License.
+# Copyright (c) 2025 Martina Plumari, Daniel Bologna.
+# Developed for the course "Computational Intelligence" 
+# at Politecnico di Torino.
+# ------------------------------------------------------
+
 import argparse
 
 logo : str = """
@@ -8,14 +15,19 @@ logo : str = """
  \____|___|   |_____|\___/_____|  |_|  
 """
 
+epilogue : str = """
+This code is licensed under the MIT License. Copyright (c) 2025 Martina Plumari, Daniel Bologna.
+Developed for the course "Computational Intelligence" at Politecnico di Torino.
+"""
+
 def parse_cmd_arguments():
     """
     Parses the main configuration parameters from the commandline.
     """
     parser = argparse.ArgumentParser(
-                    prog='./main.py',
+                    prog='../Main.py',
                     description=logo,
-                    epilog='Thanks for your support',
+                    epilog=epilogue,
                     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-d', '--dset', type=str, default="../data/", help='Dataset path.')
     parser.add_argument('-o', '--out', type=str, default="../", help='Output path.')

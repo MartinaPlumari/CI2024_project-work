@@ -1,3 +1,10 @@
+# ------------------------------------------------------
+# This code is licensed under the MIT License.
+# Copyright (c) 2025 Martina Plumari, Daniel Bologna.
+# Developed for the course "Computational Intelligence" 
+# at Politecnico di Torino.
+# ------------------------------------------------------
+
 import os
 import numpy as np
 
@@ -5,15 +12,15 @@ class Problem:
     """Problem container for easly handle input data."""
     problem_id : int
 
-    use_train_set : bool
+    use_validation_set : bool
     
-    valid_size : int
     train_size : int
+    valid_size : int
     
-    x_validation : np.ndarray
-    y_validation : np.ndarray
     x_train : np.ndarray
     y_train : np.ndarray
+    x_validation : np.ndarray
+    y_validation : np.ndarray
 
     solution : str
 
@@ -24,23 +31,23 @@ class Problem:
         # load dataset
         data = np.load(path)
 
-        self.x_validation = data['x']
-        self.y_validation = data['y']
+        self.x_train = data['x']
+        self.y_train = data['y']
         
-        self.valid_size = self.y_validation.shape[0]
-        self.use_train_set = split
+        self.train_size = self.y_train.shape[0]
+        self.use_validation_set = split
 
-        assert self.valid_size > 0, "The problem is empty, please load a valid problem file."
+        assert self.train_size > 0, "The problem is empty, please load a valid problem file."
 
-        log = f"Problem N.{self.problem_id} loaded successfully --\nVALIDATION SIZE:\t{self.valid_size}"
+        log = f"Problem N.{self.problem_id} loaded successfully --\nTRAIN SIZE:\t\t{self.train_size}"
 
-        if self.use_train_set:
+        if self.use_validation_set:
             # set the train_size as a % of the validation size
-            self.train_size = round(self.valid_size / 100 * ratio)
-            train_indexes = np.random.choice(self.valid_size, size=self.train_size, replace=False)
-            self.x_train = self.x_validation[:, train_indexes]
-            self.y_train = self.y_validation[train_indexes]
-            log += f"\nTRAIN SIZE:\t\t{self.train_size}"
+            self.valid_size = round(self.train_size / 100 * ratio)
+            valid_indices = np.random.choice(self.train_size, size=self.valid_size, replace=False)
+            self.x_valid = self.x_train[:, valid_indices]
+            self.y_valid = self.y_train[valid_indices]
+            log += f"\nVALIDATION SIZE:\t{self.valid_size}\n"
 
         print(log)
 

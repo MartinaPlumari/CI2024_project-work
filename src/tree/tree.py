@@ -139,7 +139,15 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH):
     
     return Node(func, successors), node_count
 
-#DEBUGGA STA ROBA MI RACCOMANDO CHE NON FUNZIONA
-def crossover(t1: Node, t2: Node) -> Node:
+
+def crossover(t1: Tree, t2: Tree) -> Tree:
     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
-    ...
+    root1 = t1._root
+
+    n1 = rnd.randint(0, t1._n)
+    n2 = rnd.randint(0, t2._n)
+    
+    node = t2.get_node([n2])
+    t1.insert_node([n1], root1, node)
+    
+    return t1

@@ -6,7 +6,7 @@ from .utils import arity
 
 class Node:
     _function: Callable
-    _successors: tuple['Node'] #valutare se lasciare una tupla
+    _successors: list['Node'] #valutare se lasciare una tupla
     _arity: int #questa mi serve per capire come strutturare i successori
     _str: str #penso sia una sorta di etichetta (stringa) per il nodo
     _leaf: bool #questo mi serve per capire se il nodo è una foglia
@@ -25,17 +25,17 @@ class Node:
             
             self._function = _f
             self._type = 'f'
-            self._successors = tuple(successors)
             self._arity = arity(node)
-        
-            assert self._arity is None or len(tuple(successors)) == self._arity, (
+            self._successors = list(successors) if successors is not None else []
+            
+            assert self._arity is None or len(self._successors) == self._arity, (
                 "Panic: Incorrect number of children."
                 + f" Expected {len(tuple(successors))} found {arity(node)}"
             )
             
             self._leaf = False
-            assert all(isinstance(s, Node) for s in successors), "Panic: Successors must be `Node`"
-            self._successors = tuple(successors)
+            assert all(isinstance(s, Node) for s in self._successors), "Panic: Successors must be `Node`"
+            
             if name is not None:
                 self._str = name
             elif node.__name__ == '<lambda>':
@@ -46,7 +46,7 @@ class Node:
         #SECOND CASE: the node is a number
         elif isinstance(node, numbers.Number):
             self._function = eval(f'lambda **_kw: {node}')
-            self._successors = tuple()
+            self._successors = []
             self._arity = 0
             self._type = 'c'
             if name is not None:
@@ -57,7 +57,7 @@ class Node:
         #THIRD CASE: the node is a variable
         elif isinstance(node, str):
             self._function = eval(f'lambda *, {node}, **_kw: {node}')
-            self._successors = tuple()
+            self._successors = []
             self._arity = 0
             self._type = 'v'
             self._str = str(node)

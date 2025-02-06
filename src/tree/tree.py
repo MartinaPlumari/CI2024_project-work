@@ -5,7 +5,7 @@ import random as rnd
 from .node import Node
 from .utils import arity
 
-FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.exp, np.sqrt, np.log] 
+FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp 
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 3
 
@@ -29,7 +29,7 @@ class Tree:
         for i in range(self._n_var):
             var.append('x' + str(i))
         
-        self._root = create_random_tree(var)
+        self._root, self._n = create_random_tree(var)
         
     def __str__(self):
         return str(self._root)
@@ -70,25 +70,25 @@ class Tree:
     
     #capire se modificare la struttura dati per evitare la tupla dei successori (perchè non usare una lista?)
     #attraversa nel modo giusto ma non inserisce correttamente il nodo
-    def insert_node(self, n: list, parent: Node, ins_node: Node, index: int = 0):
+    def insert_node(self, n: list, parent: Node, ins_node: Node):
         if n[0] == 0:
             if parent.is_leaf:
                 n[0] += 1
                 return
-            print("popi")
-            print(parent)
-            successors_list = list(parent._successors) 
-            successors_list[index] = ins_node
-            parent._successors = tuple(successors_list)
-            print(parent)
+            
+            if parent._successors:
+                print("Modifica del nodo...")
+                idx = rnd.randint(0, len(parent._successors)-1)
+                parent._successors[idx] = ins_node
+                
             return 
         
-        n[0] -= 1
-        
-        for i,s in enumerate(parent._successors):
-            #print(i)
-            #print(s)
-            self.insert_node(n, s, ins_node, index = i)    
+
+        for s in parent._successors:
+            n[0] -= 1
+            if n[0] < 0:
+                break 
+            self.insert_node(n, s, ins_node)   
         
         return 
     
@@ -103,42 +103,41 @@ def _get_subtree(bunch: set, node: Node):
 def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH):
     """Recursively creates a random syntax tree."""
     
+    node_count = 1
+    
     # Base case: If max depth is reached, return a leaf node (constant or variable)
     if depth >= max_depth or rnd.random() < 0.1:  # 10% chance to stop early
+        # Random variable
         if rnd.random() < 0.5:
-            return Node(rnd.choice(vars))  # Random variable
+            return Node(rnd.choice(vars)), node_count  
+        # Random constant
         else:
-            return Node(rnd.uniform(*CONSTANT_RANGE))  # Random constant
+            return Node(rnd.uniform(*CONSTANT_RANGE)), node_count  
     
     # Recursive case: Create a function node
     func = rnd.choice(FUNCTIONS)  # Choose a random function/operator
     ar = arity(func)  # Get function arity
     
+    successors = []
+    for _ in range(ar):
+        child, child_count = create_random_tree(vars, depth + 1, max_depth)
+        successors.append(child)
+        node_count += child_count  # Accumulate total nodes created
+    
+        # Handle edge cases
     if func == np.log:  # Ensure log input is positive
-        successors = [create_random_tree(vars, depth + 1, max_depth)]
-        if successors[0]._leaf is True and successors[0]._type == 'c':
-            if successors[0]() > 0 and successors[0]() < 0.001:
-                successors[0] = Node(0)
-        successors= [Node(np.absolute, successors)]  # Replace with a safe number
+        successors = [Node(np.absolute, successors)]
+        node_count += 1  # Add new absolute node
                    
     elif func == np.divide:  # Ensure denominator is not zero
-        num = create_random_tree(vars, depth + 1, max_depth)
-        denom = create_random_tree(vars, depth + 1, max_depth)
-        if denom._leaf is True and denom._type == 'c':
-            if denom() > -0.001 and denom() < 0.001:
-                denom = Node(1)  # Replace zero denominator
+        if successors[1]._leaf and successors[1]._type == 'c' and -0.001 < successors[1]() < 0.001:
+            successors[1] = Node(1)  # Replace zero denominator
 
-        successors = [num, denom]
-        
-    elif func == np.sqrt:  # Ensure log input is positive
-        successors = [create_random_tree(vars, depth + 1, max_depth)]
+    elif func == np.sqrt:  # Ensure sqrt input is positive
         successors = [Node(np.absolute, successors)]
-
-    else:
-        # Generate child nodes recursively
-        successors = [create_random_tree(vars, depth + 1, max_depth) for _ in range(ar)]
+        node_count += 1  # Add new absolute node
     
-    return Node(func, successors)
+    return Node(func, successors), node_count
 
 #DEBUGGA STA ROBA MI RACCOMANDO CHE NON FUNZIONA
 def crossover(t1: Node, t2: Node) -> Node:

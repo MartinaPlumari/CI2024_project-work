@@ -1,6 +1,7 @@
 import numpy as np
 import tree.tree as t
 from tree.node import Node
+import random
 
 problem = np.load('../data/problem_0.npz')
 x = problem['x'] #variables
@@ -24,14 +25,23 @@ tree1 = t.create_random_tree(var)
 #while str(tree2) == 'nan':   
 tree2 = t.create_random_tree(var)
 
-t = t.Tree(x, y)
-n = [3]
-nodo = t.get_node(n)
-n2 = [6]
-print(t)
+t1 = t.Tree(x, y)
+t2 = t.Tree(x, y)
+n = list()
+n.append(random.randint(0, t2._n))
+nodo = t2.get_node(n)
+n2 = list()
+n2.append(random.randint(0, t1._n))
+print("Albero pre modifica:")
+print(t1)
+print(t1._n)
+print("Albero 2:")
+print(t2)
+print("Nodo da inserire:")
 print(nodo)
-t.insert_node(n2, t._root, nodo)
-#print(str(t))
+t1.insert_node(n2, t1._root, nodo)
+print("Albero post modifica:")
+print(str(t1))
 #print(nodo)
 #print(t())
 #print(t.fitness)

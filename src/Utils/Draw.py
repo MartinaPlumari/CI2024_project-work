@@ -51,9 +51,6 @@ def compute_edges(node : Node, counter=[2], node_id_map={}, edges=[], labels={},
 def draw_tree(root : Node) -> None:
 	
 	(edges, labels) = compute_edges(root, parent_id=1)
-
-	print(sorted(edges))
-	print(labels)
 	
 	# Creazione del grafo
 	G = nx.DiGraph()

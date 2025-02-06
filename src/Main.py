@@ -28,11 +28,13 @@ if __name__ == '__main__':
 
     # algorithm
 
-    print(tree)
-    # plotting & Draw best solution
-    draw.draw_tree(tree._root)
+    problem.solution = tree
 
     # save the problems solution in the s310582.py file
     saver = Saver(opt.out, opt.name, opt.id)
-    for problem in pl.problems:
-        saver.append_solution(problem)
+    saver.append_solution(problem)
+    #for problem in pl.problems:
+
+
+    # plotting & Draw best solution
+    draw.draw_tree(tree._root)

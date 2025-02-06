@@ -27,7 +27,7 @@ class Tree:
         self._n_var = x.shape[0]
         
         for i in range(self._n_var):
-            var.append('x' + str(i))
+            var.append(f'x{str(i)}')
         
         self._root, self._n = create_random_tree(var)
         

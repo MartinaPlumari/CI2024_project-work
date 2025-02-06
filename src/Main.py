@@ -5,9 +5,13 @@
 # at Politecnico di Torino.
 # ------------------------------------------------------
 
+from tree.tree import Tree
+
 import Utils.ArgParser as ap
-from Utils.ProblemLoader import ProblemList
+from Utils.ProblemLoader import ProblemList, Problem
 from Utils.Saver import Saver
+import Utils.Draw as draw 
+
 
 #!/usr/bin/python3
 if __name__ == '__main__':
@@ -17,7 +21,15 @@ if __name__ == '__main__':
     pl = ProblemList()
     pl.load_from_path(opt.dset, opt.count, opt.split, opt.ratio)
     
+    problem : Problem = pl.problems[0]
+
+    # print(problem.x_train)
+    # print(problem.y_train)
+
     # tree gen
+    tree = Tree(problem.x_train, problem.y_train)
+
+    draw.draw_tree(tree._root)
 
     # algorithm
 

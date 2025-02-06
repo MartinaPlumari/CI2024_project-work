@@ -29,7 +29,7 @@ class Tree:
         for i in range(self._n_var):
             var.append('x' + str(i))
         
-        self._root, self._n = create_random_tree(var)
+        (self._root, self._n )= create_random_tree(var)
         
     def __str__(self):
         return str(self._root)

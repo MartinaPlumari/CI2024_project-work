@@ -32,7 +32,7 @@ def hierarchy_pos(G, root, width=1.0, vert_gap=0.2, xcenter=0.5, pos=None, level
 # # Etichette dei nodi
 # labels = {1: "Root", 2: "A", 3: "B", 4: "C", 5: "D", 6: "E", 7: "F"}
 
-def compute_edges(node : Node, counter=[2], node_id_map={}, edges=[], labels={}, parent_id=None) -> tuple[list, object]:
+def compute_edges(node : Node, counter=[1], node_id_map={}, edges=[], labels={}, parent_id=None) -> tuple[list, object]:
 	# Assegna un ID univoco al nodo
 	node_id = counter[0]
 	node_id_map[node] = node_id
@@ -50,7 +50,8 @@ def compute_edges(node : Node, counter=[2], node_id_map={}, edges=[], labels={},
 
 def draw_tree(root : Node) -> None:
 	
-	(edges, labels) = compute_edges(root, parent_id=1)
+	(edges, labels) = compute_edges(root, parent_id=0)
+	edges.pop(0)
 	
 	# Creazione del grafo
 	G = nx.DiGraph()

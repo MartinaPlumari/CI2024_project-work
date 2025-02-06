@@ -23,17 +23,14 @@ if __name__ == '__main__':
     
     problem : Problem = pl.problems[0]
 
-    # print(problem.x_train)
-    # print(problem.y_train)
-
     # tree gen
     tree = Tree(problem.x_train, problem.y_train)
 
-    draw.draw_tree(tree._root)
-
     # algorithm
 
+    print(tree)
     # plotting & Draw best solution
+    draw.draw_tree(tree._root)
 
     # save the problems solution in the s310582.py file
     saver = Saver(opt.out, opt.name, opt.id)

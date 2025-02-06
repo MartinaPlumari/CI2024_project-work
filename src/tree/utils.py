@@ -8,11 +8,11 @@ def get_function_signature(func) -> str:
     Tries using inspect.signature, falls back to parsing docstrings or np.info.
     """
     # Attempt to use inspect.signature
-    try:
-        sig = inspect.signature(func)
-        return str(sig)
-    except ValueError:
-        pass 
+    # try:
+    #     sig = inspect.signature(func)
+    #     return str(sig)
+    # except ValueError:
+    #     pass 
     
     # Attempt to parse the first line of the docstring
     if func.__doc__:

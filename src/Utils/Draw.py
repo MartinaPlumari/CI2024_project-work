@@ -52,7 +52,7 @@ def draw_tree(root : Node) -> None:
 	
 	(edges, labels) = compute_edges(root, parent_id=1)
 
-	print(edges)
+	print(sorted(edges))
 	print(labels)
 	
 	# Creazione del grafo

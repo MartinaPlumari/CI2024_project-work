@@ -221,4 +221,29 @@ def permutation_mutation(t: Tree) -> Tree:
     node1._successors = node1._successors[::-1]
     
     return t
+
+#Not good. It would be better to simplify the tree as we traverse it
+def simplify_tree(t: Tree) -> Tree:
+    """Simplifies the tree by evaluating and replacing constant expressions."""
     
+    def simplify_node(node: Node):
+        """Recursively simplifies a node."""
+        if node.is_leaf:
+            return node  # Leaves cannot be simplified
+        
+        # Simplify all successors first (post-order traversal)
+        for i, child in enumerate(node._successors):
+            node._successors[i] = simplify_node(child)
+        
+        # If all successors are constants, evaluate the node
+        if all(child.is_leaf and child._type == 'c' for child in node._successors):
+            try:
+                new_value = node()  # Evaluate node's function
+                return Node(new_value)  # Replace with a constant node
+            except Exception:
+                return node  # Keep the node if an error occurs
+        
+        return node  # If simplification is not possible, return node as is
+
+    t._root = simplify_node(t._root)  # Start simplification from the root
+    return t

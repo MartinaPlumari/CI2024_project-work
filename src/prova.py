@@ -38,6 +38,12 @@ print(t1)
 
 print("Albero prima della permutation mutation:")
 print(t2)
-t1 = t.permutation_mutation(t2)
+t2 = t.permutation_mutation(t2)
 print("Albero dopo la permutation mutation:")
+print(t2)
+
+print("Albero prima della semplificazione:")
+print(t2)
+t2 = t.simplify_tree(t2)
+print("Albero dopo la semplificazione:")
 print(t2)

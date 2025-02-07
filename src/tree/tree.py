@@ -93,6 +93,7 @@ class Tree:
         
         return 
     
+    
 
 def _get_subtree(bunch: set, node: Node):
     bunch.add(node)
@@ -172,8 +173,6 @@ def point_mutation(t: Tree) -> Tree:
     n = rnd.randint(0, t._n-1)
     node = t.get_node([n])
     
-    print(node)
-    
     while node is None or node.is_leaf or node.short_name == 'np.absolute':
         n = rnd.randint(0, t._n-1)
         node = t.get_node([n])
@@ -196,7 +195,13 @@ def point_mutation(t: Tree) -> Tree:
             node._successors = [Node(np.absolute, node._successors)]
     
     new_node = Node(func, node._successors)
+    parent = node._parent
+    if(parent is None):
+        t._root = new_node
+    else:
+        new_node._parent = parent
+        node._parent._successors[parent._successors.index(node)] = new_node
     
-    t.insert_node([n], t._root, new_node)     
+    #t.insert_node([n], t._root, new_node)     
     
     return t

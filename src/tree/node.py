@@ -6,7 +6,8 @@ from .utils import arity
 
 class Node:
     _function: Callable
-    _successors: list['Node'] #valutare se lasciare una tupla
+    _successors: list['Node']
+    _parent: 'Node'
     _arity: int #questa mi serve per capire come strutturare i successori
     _str: str #penso sia una sorta di etichetta (stringa) per il nodo
     _leaf: bool #questo mi serve per capire se il nodo è una foglia
@@ -14,6 +15,9 @@ class Node:
 
 
     def __init__(self, node=None, successors= None, *, name=None):
+        
+        self._parent = None
+        
         #FIRST CASE: the node is a function (or an operator, the two cases can coincide when using np)
         if callable(node):
             
@@ -35,6 +39,9 @@ class Node:
             
             self._leaf = False
             assert all(isinstance(s, Node) for s in self._successors), "Panic: Successors must be `Node`"
+            
+            for s in self._successors:
+                s._parent = self
             
             if name is not None:
                 self._str = name
@@ -88,7 +95,6 @@ class Node:
             return self.short_name
         else:
             return f'{self.short_name}(' + ', '.join(c.long_name for c in self._successors) + ')'
-
     
     def get_successors(self):
         return self._successors

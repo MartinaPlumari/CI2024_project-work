@@ -170,6 +170,9 @@ def crossover(t1: Tree, t2: Tree) -> Tree:
 def point_mutation(t: Tree) -> Tree:
     """Performs a mutation by replacing a function node with a different random function."""
     
+    if t._n < 2:
+        return t
+    
     n = rnd.randint(0, t._n-1)
     node = t.get_node([n])
     
@@ -200,26 +203,21 @@ def point_mutation(t: Tree) -> Tree:
         t._root = new_node
     else:
         new_node._parent = parent
-        node._parent._successors[parent._successors.index(node)] = new_node
-    
-    #t.insert_node([n], t._root, new_node)     
+        node._parent._successors[parent._successors.index(node)] = new_node  
     
     return t
 
 def permutation_mutation(t: Tree) -> Tree:
     """Exchanges two lives in the tree"""
     
-    if t._n < 2:
+    valid_nodes = [i for i in range(t._n) if not t.get_node([i]).is_leaf and t.get_node([i])._arity > 1]
+    
+    if not valid_nodes:
         return t
     
-    n1 = rnd.randint(0, t._n-1)
-    
+    n1 = rnd.choice(valid_nodes)
     node1 = t.get_node([n1])
     
-    while node1 is None or node1.is_leaf or node1._arity == 1:
-        n1 = rnd.randint(0, t._n-1)
-        node1 = t.get_node([n1])
-        
     node1._successors = node1._successors[::-1]
     
     return t

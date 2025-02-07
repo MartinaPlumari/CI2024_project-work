@@ -238,12 +238,13 @@ def hoist_mutation(t: Tree) -> Tree:
         node = t.get_node([n])
     
     t._root = node
+    t._h = get_tree_height(t._root)
+    t._n = count_nodes(t._root)
     
     return t
 
 def collapse_mutation(t: Tree) -> Tree:
-    """Performs a hoist mutation by replacing the root node with a random subtree."""
-
+    """Performs a collapse mutation by replacing a subtree with a leaf node."""
     
     if t._n < 3:
         return t
@@ -268,6 +269,34 @@ def collapse_mutation(t: Tree) -> Tree:
     parent = node._parent
     new_node._parent = parent
     parent._successors[parent._successors.index(node)] = new_node
+    
+    t._h = get_tree_height(t._root)
+    t._n = count_nodes(t._root)
+    
+    return t
+
+def expansion_mutation(t: Tree) -> Tree:
+    """Performs an expansion mutation by replacing a leaf node with a random subtree."""
+    
+    n = rnd.randint(0, t._n-1)
+    node = t.get_node([n])
+    
+    while node is None or not node.is_leaf:
+        n = rnd.randint(0, t._n-1)
+        node = t.get_node([n])
+    
+    var = []
+    for i in range(t._n_var):
+        var.append(f'x{str(i)}')
+    
+    new_node, _ = create_random_tree(var, 0, MAX_DEPTH//2)
+    
+    parent = node._parent
+    new_node._parent = parent
+    parent._successors[parent._successors.index(node)] = new_node
+    
+    t._h = get_tree_height(t._root)
+    t._n = count_nodes(t._root)
     
     return t
 

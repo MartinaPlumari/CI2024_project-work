@@ -30,6 +30,7 @@ class Tree:
             var.append('x' + str(i))
         
         self._root, self._n = create_random_tree(var)
+        self._h = get_tree_height(self._root)
         
     def __str__(self):
         return str(self._root)
@@ -68,9 +69,8 @@ class Tree:
         
         return None
     
-    #capire se modificare la struttura dati per evitare la tupla dei successori (perchè non usare una lista?)
-    #attraversa nel modo giusto ma non inserisce correttamente il nodo
     def insert_node(self, n: list, parent: Node, ins_node: Node):
+        
         if n[0] == 0:
             if parent.is_leaf:
                 n[0] += 1
@@ -90,6 +90,7 @@ class Tree:
                 break 
             self.insert_node(n, s, ins_node)   
         
+        
         return 
     
 
@@ -98,15 +99,26 @@ def _get_subtree(bunch: set, node: Node):
     for c in node._successors:
         _get_subtree(bunch, c) 
     
+def get_tree_height(node: Node) -> int: 
+    """Recursively calculates the height of a given tree."""
+    if node.is_leaf:
+        return 1  # Leaf nodes have height 1
+    
+    return 1 + max(get_tree_height(child) for child in node.get_successors())
+
+def count_nodes(node):
+    """Recursively counts the total number of nodes in the tree."""
+    return 1 + sum(count_nodes(child) for child in node.get_successors())
 
 #problema, spesso escono valori nan o errori (divide by 0, log di numeri negativi, ecc)
-def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH):
-    """Recursively creates a random syntax tree."""
+def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = 'grow'):
+    """Recursively creates a random syntax tree"""
     
     node_count = 1
     
     # Base case: If max depth is reached, return a leaf node (constant or variable)
-    if depth >= max_depth or rnd.random() < 0.1:  # 10% chance to stop early
+    #if grow is selected as a mode, we have a chance of 10% to stop early
+    if depth >= max_depth or (mode == 'grow' and rnd.random() < 0.1):  
         # Random variable
         if rnd.random() < 0.5:
             return Node(rnd.choice(vars)), node_count  
@@ -149,5 +161,42 @@ def crossover(t1: Tree, t2: Tree) -> Tree:
     
     node = t2.get_node([n2])
     t1.insert_node([n1], root1, node)
+    t1._n = count_nodes(t1._root)
+    t1._h = get_tree_height(t1._root)
     
     return t1
+
+def point_mutation(t: Tree) -> Tree:
+    """Performs a mutation by replacing a function node with a different random function."""
+    
+    n = rnd.randint(0, t._n-1)
+    node = t.get_node([n])
+    
+    print(node)
+    
+    while node is None or node.is_leaf or node.short_name == 'np.absolute':
+        n = rnd.randint(0, t._n-1)
+        node = t.get_node([n])
+        #print(node)
+    
+    old_arity = node._arity
+    func = rnd.choice([f for f in FUNCTIONS if (("np." + f.__name__) != node.short_name and arity(f) == old_arity)])           
+    
+    print(f"Replacing function {node._str} with {func.__name__}")
+    
+    if func == np.log and node._successors[0].short_name != 'np.absolute':
+         node._successors = [Node(np.absolute, node._successors)]
+    elif func == np.divide:
+        if node._successors[1]._leaf and node._successors[1]._type == 'c' and -0.001 < node._successors[1]() < 0.001:
+            node._successors[1] = Node(1)
+    elif func == np.sqrt:
+        if node._successors[0]._leaf and node._successors[0]._type == 'c' and -0.001 < node._successors[0]() < 0.001:
+            node._successors[0] = Node(0.1)
+        if node._successors[0].short_name != 'np.absolute':
+            node._successors = [Node(np.absolute, node._successors)]
+    
+    new_node = Node(func, node._successors)
+    
+    t.insert_node([n], t._root, new_node)     
+    
+    return t

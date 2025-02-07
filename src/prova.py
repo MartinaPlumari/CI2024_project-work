@@ -27,12 +27,13 @@ tree2 = t.create_random_tree(var)
 
 t1 = t.Tree(x, y)
 t2 = t.Tree(x, y)
-print("Albero da cui partire:")
+#print("Albero da cui partire:")
+#print(t1)
+#print(t.get_tree_height(t1._root))
+print("Albero prima della mutazione:")
 print(t1)
-print("Albero da cui estrarre il nodo:")
-print(t2)
-t1 = t.crossover(t1, t2)
-print("Albero dopo il crossover:")
+t1 = t.point_mutation(t1)
+print("Albero dopo la mutazione:")
 print(t1)
 
 # #prova funz insert e get_node

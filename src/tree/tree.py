@@ -275,6 +275,29 @@ def collapse_mutation(t: Tree) -> Tree:
     
     return t
 
+def subtree_mutation(t: Tree) -> Tree:
+    """Performs a subtree mutation by replacing a subtree with a one of its subtree."""
+    
+    if t._n < 3:
+        return t
+    
+    n = rnd.randint(1, t._n-1)
+    node = t.get_node([n])
+    
+    while node is None or node.is_leaf or node.short_name == 'np.absolute':
+        n = rnd.randint(1, t._n-1)
+        node = t.get_node([n])
+    
+    new_node = node._successors[rnd.randint(0, len(node._successors)-1)]
+    parent = node._parent
+    new_node._parent = parent
+    parent._successors[parent._successors.index(node)] = new_node
+    
+    t._h = get_tree_height(t._root)
+    t._n = count_nodes(t._root)
+    
+    return t
+
 def expansion_mutation(t: Tree) -> Tree:
     """Performs an expansion mutation by replacing a leaf node with a random subtree."""
     
@@ -289,7 +312,7 @@ def expansion_mutation(t: Tree) -> Tree:
     for i in range(t._n_var):
         var.append(f'x{str(i)}')
     
-    new_node, _ = create_random_tree(var, 0, MAX_DEPTH//2)
+    new_node, _ = create_random_tree(var, 0, rnd.randint(1, MAX_DEPTH))
     
     parent = node._parent
     new_node._parent = parent

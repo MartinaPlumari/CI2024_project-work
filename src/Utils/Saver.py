@@ -6,6 +6,7 @@
 # ------------------------------------------------------
 
 from Utils.ProblemLoader import Problem
+import re
 
 class Saver:
     base_path : str
@@ -27,9 +28,9 @@ class Saver:
             f.close()
 
     def append_solution(self, problem : Problem) -> None:
-        assert problem.solution == "", "The solution is empty! Please try using a proper solution."
+        assert problem.solution != "", "The solution is empty! Please try using a proper solution."
 
-        solution_function = f"def f{problem.problem_id}(n : np.ndarray) -> np.ndarray:\n\treturn {problem.solution}\n\n"
+        solution_function = f"def f{problem.problem_id}(x : np.ndarray) -> np.ndarray:\n\treturn {re.sub(r'x(\d+)', lambda m: f'x[{m.group(1)}]', str(problem.solution))}\n\n"
 
         with open(f"{self.base_path}{self.student_id}.py", 'a') as f:
             f.write(solution_function)

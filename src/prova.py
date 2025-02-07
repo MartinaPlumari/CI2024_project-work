@@ -30,11 +30,17 @@ t2 = t.Tree(x, y)
 #print("Albero da cui partire:")
 #print(t1)
 #print(t.get_tree_height(t1._root))
-print("Albero prima della mutazione:")
+print("Albero prima della mutazione puntiforme:")
 print(t1)
 t1 = t.point_mutation(t1)
 print("Albero dopo la mutazione:")
 print(t1)
+
+print("Albero prima della permutation mutation:")
+print(t2)
+t1 = t.permutation_mutation(t2)
+print("Albero dopo la permutation mutation:")
+print(t2)
 
 # #prova funz insert e get_node
 # n = list()

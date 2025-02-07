@@ -176,11 +176,11 @@ def point_mutation(t: Tree) -> Tree:
     while node is None or node.is_leaf or node.short_name == 'np.absolute':
         n = rnd.randint(0, t._n-1)
         node = t.get_node([n])
-        #print(node)
     
     old_arity = node._arity
     func = rnd.choice([f for f in FUNCTIONS if (("np." + f.__name__) != node.short_name and arity(f) == old_arity)])           
     
+    #this has debug purposes: to be deleted
     print(f"Replacing function {node._str} with {func.__name__}")
     
     if func == np.log and node._successors[0].short_name != 'np.absolute':
@@ -205,3 +205,22 @@ def point_mutation(t: Tree) -> Tree:
     #t.insert_node([n], t._root, new_node)     
     
     return t
+
+def permutation_mutation(t: Tree) -> Tree:
+    """Exchanges two lives in the tree"""
+    
+    if t._n < 2:
+        return t
+    
+    n1 = rnd.randint(0, t._n-1)
+    
+    node1 = t.get_node([n1])
+    
+    while node1 is None or node1.is_leaf or node1._arity == 1:
+        n1 = rnd.randint(0, t._n-1)
+        node1 = t.get_node([n1])
+        
+    node1._successors = node1._successors[::-1]
+    
+    return t
+    

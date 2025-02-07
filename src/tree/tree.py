@@ -8,6 +8,8 @@ from .utils import arity
 FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp 
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 3
+VARIABLE_P = 0.5
+EARLY_STOP_P = 0.1
 
 class Tree:
     _root: Node
@@ -118,10 +120,10 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = 'grow'):
     node_count = 1
     
     # Base case: If max depth is reached, return a leaf node (constant or variable)
-    #if grow is selected as a mode, we have a chance of 10% to stop early
-    if depth >= max_depth or (mode == 'grow' and rnd.random() < 0.1):  
+    #if grow is selected as a mode, we have a chance of stopping early
+    if depth >= max_depth or (mode == 'grow' and rnd.random() < EARLY_STOP_P):  
         # Random variable
-        if rnd.random() < 0.5:
+        if rnd.random() < VARIABLE_P:
             return Node(rnd.choice(vars)), node_count  
         # Random constant
         else:
@@ -239,6 +241,35 @@ def hoist_mutation(t: Tree) -> Tree:
     
     return t
 
+def collapse_mutation(t: Tree) -> Tree:
+    """Performs a hoist mutation by replacing the root node with a random subtree."""
+
+    
+    if t._n < 3:
+        return t
+    
+    n = rnd.randint(1, t._n-1)
+    node = t.get_node([n])
+    
+    while node is None or node.is_leaf or node._parent is None or node.short_name == 'np.absolute':
+        n = rnd.randint(1, t._n-1)
+        node = t.get_node([n])
+    
+    var = []
+    for i in range(t._n_var):
+        var.append(f'x{str(i)}')
+    
+    if rnd.random() < VARIABLE_P:
+        new_node = Node(rnd.choice(var)) 
+        # Random constant
+    else:
+        new_node = Node(rnd.uniform(*CONSTANT_RANGE))
+        
+    parent = node._parent
+    new_node._parent = parent
+    parent._successors[parent._successors.index(node)] = new_node
+    
+    return t
 
 def simplify_tree(t: Tree) -> Tree:
     """Simplifies the tree by evaluating and replacing constant expressions."""

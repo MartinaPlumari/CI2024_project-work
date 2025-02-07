@@ -222,14 +222,31 @@ def permutation_mutation(t: Tree) -> Tree:
     
     return t
 
-#Not good. It would be better to simplify the tree as we traverse it
+def hoist_mutation(t: Tree) -> Tree:
+    """Performs a hoist mutation by replacing the root node with a random subtree."""
+    
+    if t._n < 3:
+        return t
+    
+    n = rnd.randint(1, t._n-1)
+    node = t.get_node([n])
+    
+    while node is None or node.is_leaf:
+        n = rnd.randint(1, t._n-1)
+        node = t.get_node([n])
+    
+    t._root = node
+    
+    return t
+
+
 def simplify_tree(t: Tree) -> Tree:
     """Simplifies the tree by evaluating and replacing constant expressions."""
     
     def simplify_node(node: Node):
         """Recursively simplifies a node."""
         if node.is_leaf:
-            return node  # Leaves cannot be simplified
+            return node  
         
         # Simplify all successors first (post-order traversal)
         for i, child in enumerate(node._successors):
@@ -238,12 +255,12 @@ def simplify_tree(t: Tree) -> Tree:
         # If all successors are constants, evaluate the node
         if all(child.is_leaf and child._type == 'c' for child in node._successors):
             try:
-                new_value = node()  # Evaluate node's function
-                return Node(new_value)  # Replace with a constant node
+                new_value = node()  
+                return Node(new_value)  
             except Exception:
-                return node  # Keep the node if an error occurs
+                return node  
         
-        return node  # If simplification is not possible, return node as is
+        return node  
 
-    t._root = simplify_node(t._root)  # Start simplification from the root
+    t._root = simplify_node(t._root) 
     return t

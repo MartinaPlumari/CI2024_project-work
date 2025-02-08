@@ -12,13 +12,13 @@ from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp 
+FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide] #np.exp, np.tan, np.sin, np.cos, np.sqrt, np.log
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 3
 VARIABLE_P = 0.5
 EARLY_STOP_P = 0.1
 
-class init_method(Enum):
+class INIT_METHOD(Enum):
     GROW = 0
     FULL = 1
 
@@ -34,7 +34,7 @@ class Tree:
     _y: np.ndarray
     _fitness: float
      
-    def __init__(self, x: np.ndarray, y: np.ndarray, init_method: init_method = init_method.GROW, depth: int = MAX_DEPTH):   
+    def __init__(self, x: np.ndarray, y: np.ndarray, INIT_METHOD: INIT_METHOD = INIT_METHOD.GROW, depth: int = MAX_DEPTH):   
         self._root = Node('nan')
         self._n = 0
         self._n_var = 0
@@ -47,7 +47,7 @@ class Tree:
         for i in range(self._n_var):
             var.append(f'x{str(i)}')
         
-        self._root, self._n = create_random_tree(var, 0, depth, init_method)
+        self._root, self._n = create_random_tree(var, 0, depth, INIT_METHOD)
         self._h = get_tree_height(self._root)
         self._fitness = self.fitness
         
@@ -129,14 +129,14 @@ def count_nodes(node):
     return 1 + sum(count_nodes(child) for child in node.get_successors())
 
 #problema, spesso escono valori nan o errori (divide by 0, log di numeri negativi, ecc)
-def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = init_method.GROW) -> tuple[Node, int]:
+def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = INIT_METHOD.GROW) -> tuple[Node, int]:
     """Recursively creates a random syntax tree"""
     
     node_count = 1
     
     # Base case: If max depth is reached, return a leaf node (constant or variable)
     #if grow is selected as a mode, we have a chance of stopping early
-    if depth >= max_depth or (mode == init_method.GROW and rnd.random() < EARLY_STOP_P):  
+    if depth >= max_depth or (mode == INIT_METHOD.GROW and rnd.random() < EARLY_STOP_P):  
         # Random variable
         if rnd.random() < VARIABLE_P:
             return Node(rnd.choice(vars)), node_count  
@@ -201,7 +201,6 @@ def crossover(t1: Tree, t2: Tree) -> Tree:
         n2 = rnd.randint(0, t2._n-1)
         node2 = t2.get_node([n2])
     
-    print(f"Node1: {node1.short_name} Node2: {node2.short_name}")
     #implementare copy
     new_node = copy.deepcopy(node2)
     new_node._parent = node1._parent

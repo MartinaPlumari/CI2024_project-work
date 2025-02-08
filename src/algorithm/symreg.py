@@ -91,7 +91,7 @@ class Symreg:
 	#tournament selection without replacement (try with replacement)
 	def _parent_selection(self, population : list[t.Tree]):
 		tournament_contestants = np.random.choice(population, self.TOURNAMENT_SIZE, replace=False) 
-		best_candidate = max(tournament_contestants, key=lambda x: x.fitness) 
+		best_candidate = max(tournament_contestants, key=lambda x: x._fitness) 
 		return best_candidate
  	
 	def _mutation(self, individual : t.Tree) -> t.Tree:
@@ -137,20 +137,24 @@ class Symreg:
 		Use hyper modern approach
 		"""
 		offspring : list[t.Tree] = list()
-
+		
 		for _ in range(self.OFFSPRING_SIZE):
-			if np.random.random() < self.GEN_OP_PROBABILITY:
-				# MUTATION
-				p : t.Tree = self._parent_selection(population)
-				o : t.Tree = self._mutation(p)
-			else:
-				# RECOMBINATION
-				p1 : t.Tree = self._parent_selection(population)
-				p2 : t.Tree = self._parent_selection(population)
+			p : t.Tree = self._parent_selection(population)
+			o : t.Tree = self._mutation(p)
+
+		# for _ in range(self.OFFSPRING_SIZE):
+		# 	if np.random.random() < self.GEN_OP_PROBABILITY:
+		# 		# MUTATION
+		# 		p : t.Tree = self._parent_selection(population)
+		# 		o : t.Tree = self._mutation(p)
+		# 	else:
+		# 		# RECOMBINATION
+		# 		p1 : t.Tree = self._parent_selection(population)
+		# 		p2 : t.Tree = self._parent_selection(population)
 				
-				o : t.Tree = t.crossover(p1, p2)
+		# 		o : t.Tree = t.crossover(p1, p2)
 			
-			offspring.append(o)
+		offspring.append(o)
 
 		match self.POP_MODEL:
 			case self.POPULTAION_MODEL.STEADY_STATE:
@@ -165,5 +169,13 @@ class Symreg:
 	
 	def train(self) -> None:
 		current_solution : list[t.Tree] = self.population.copy()
+		best_solution : t.Tree = current_solution[0]
 		for i in range(self.MAX_GENERATIONS):
 			current_solution = self._step(current_solution)
+			if best_solution._fitness < current_solution[0]._fitness:
+				best_solution = current_solution[0]
+			
+			if i % 50 == 0:
+				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
+		
+		self.problem.solution = best_solution

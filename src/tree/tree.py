@@ -7,6 +7,7 @@
 
 import numpy as np
 import random as rnd
+from enum import Enum 
 from tree.node import Node
 from utils.arity import arity
 
@@ -16,17 +17,22 @@ MAX_DEPTH = 3
 VARIABLE_P = 0.5
 EARLY_STOP_P = 0.1
 
+class init_method(Enum):
+    GROW = 0
+    FULL = 1
+
 class Tree:
     """
     TODO
     """
+    
     _root: Node
     _n: int
     _h: int
     _x: np.ndarray
     _y: np.ndarray
-    
-    def __init__(self, x: np.ndarray, y: np.ndarray):
+     
+    def __init__(self, x: np.ndarray, y: np.ndarray, init_method: init_method = init_method.GROW, depth: int = MAX_DEPTH):   
         self._root = Node('nan')
         self._n = 0
         self._n_var = 0
@@ -39,7 +45,7 @@ class Tree:
         for i in range(self._n_var):
             var.append(f'x{str(i)}')
         
-        self._root, self._n = create_random_tree(var)
+        self._root, self._n = create_random_tree(var, 0, depth, init_method)
         self._h = get_tree_height(self._root)
         
     def __str__(self):
@@ -122,14 +128,14 @@ def count_nodes(node):
     return 1 + sum(count_nodes(child) for child in node.get_successors())
 
 #problema, spesso escono valori nan o errori (divide by 0, log di numeri negativi, ecc)
-def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = 'grow'):
+def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = init_method.GROW) -> tuple[Node, int]:
     """Recursively creates a random syntax tree"""
     
     node_count = 1
     
     # Base case: If max depth is reached, return a leaf node (constant or variable)
     #if grow is selected as a mode, we have a chance of stopping early
-    if depth >= max_depth or (mode == 'grow' and rnd.random() < EARLY_STOP_P):  
+    if depth >= max_depth or (mode == init_method.GROW and rnd.random() < EARLY_STOP_P):  
         # Random variable
         if rnd.random() < VARIABLE_P:
             return Node(rnd.choice(vars)), node_count  

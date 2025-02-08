@@ -88,6 +88,15 @@ class Node:
     def __len__(self):
         return 1 + sum(len(s) for s in self._successors) 
     
+    def __copy__(self):
+        match self._type:
+            case 'f':
+                return Node(self._function, [s.__copy__() for s in self._successors])
+            case 'c':
+                return Node(float(self._str))
+            case 'v':
+                return Node(self._str)
+    
     @property
     def is_leaf(self):
         return self._leaf

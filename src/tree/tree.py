@@ -12,7 +12,7 @@ from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide] #np.exp, np.tan, np.sin, np.cos, np.sqrt, np.log
+FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 3
 VARIABLE_P = 0.5
@@ -186,23 +186,25 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = INIT_METHO
 
 def crossover(t1: Tree, t2: Tree) -> Tree:
     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
+    if t1._n < 2 or t2._n < 2:
+        return t1
 
     n1 = rnd.randint(0, t1._n-1)
     node1 = t1.get_node([n1])
     
-    while node1 is None and node1.short_name == 'np.absolute':
+    while node1 is None or node1._parent is None or node1.short_name == 'np.absolute':
         n1 = rnd.randint(0, t1._n-1)
         node1 = t1.get_node([n1])
     
     n2 = rnd.randint(0, t2._n-1)
     node2 = t2.get_node([n2])
     
-    while node2 is None:
+    while node2 is None or node2.is_leaf:
         n2 = rnd.randint(0, t2._n-1)
         node2 = t2.get_node([n2])
     
     #implementare copy
-    new_node = copy.deepcopy(node2)
+    new_node = node2.__copy__()
     new_node._parent = node1._parent
     
     if node1._parent is None:

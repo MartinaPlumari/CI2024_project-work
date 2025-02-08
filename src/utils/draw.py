@@ -60,6 +60,7 @@ def draw_tree(root : Node) -> None:
 	pos = hierarchy_pos(G, root=1)
 
 	# Disegno dell'albero
+	plt.close('all') 
 	plt.figure(figsize=(8, 6))
 	nx.draw(G, pos, with_labels=False, node_color="lightblue", edge_color="black", node_size=1200, arrows=False)
 	nx.draw_networkx_labels(G, pos, labels=labels, font_size=12, font_color="black")

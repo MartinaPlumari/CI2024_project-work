@@ -10,6 +10,7 @@ from utils.problemloader import Problem
 from enum import Enum
 import random
 import numpy as np
+import utils.draw as draw
 
 
 class Symreg:
@@ -38,6 +39,7 @@ class Symreg:
 	MAX_GENERATIONS : int
 	MUTATION_PROBABILITY : float
 	TOURNAMENT_SIZE : int
+	USE_RAND_MUT_TYPE : bool
 	EPOCHS : int
 	
 	
@@ -52,6 +54,7 @@ class Symreg:
 			  mutation_type : MUTATION = MUTATION.POINT,
 			  mutation_probability : float = 0.05,
 			  tournament_size : int = 3,
+			  use_random_mutation_type : bool = False,
 			  epochs : int = 1_000) -> None:
 		
 		# initalize variables
@@ -61,6 +64,7 @@ class Symreg:
 		self.MUTATION_TYPE = mutation_type
 		self.MUTATION_PROBABILITY = mutation_probability
 		self.TOURNAMENT_SIZE = tournament_size
+		self.USE_RAND_MUT_TYPE = use_random_mutation_type
 		self.EPOCHS = epochs
 
 		# extract problem data
@@ -73,7 +77,6 @@ class Symreg:
 		# init population
 		for _ in range(self.POPULATION_SIZE):
 			self.population.append(t.Tree(x, y))
-	
 	
 	def parent_selection(self):
 		candidates = sorted(np.random.choice(self.population, self.TOURNAMENT_SIZE), key=lambda x: x.fitness, reverse = True)
@@ -98,23 +101,22 @@ class Symreg:
 
 		if use_random_mutation_type:
 			# select random mutation type
-			random.randint(0, len(self.MUTATION) - 1)
-			pass
-		else:
-			# select mutation type
-			match mut_type:
-				case self.MUTATION.SUBTREE:
-					individual = t.subtree_mutation(individual)
-				case self.MUTATION.POINT:
-					individual = t.point_mutation(individual)
-				case self.MUTATION.PERMUT:
-					individual = t.permutation_mutation(individual)
-				case self.MUTATION.HOIST:
-					individual = t.hoist_mutation(individual)
-				case self.MUTATION.EXPANSION:
-					individual = t.expansion_mutation(individual)
-				case self.MUTATION.COLLAPSE:
-					individual = t.collapse_mutation(individual)
+			mut_type = random.choice(list(self.MUTATION))
+			
+		# select mutation type
+		match mut_type:
+			case self.MUTATION.SUBTREE:
+				individual = t.subtree_mutation(individual)
+			case self.MUTATION.POINT:
+				individual = t.point_mutation(individual)
+			case self.MUTATION.PERMUT:
+				individual = t.permutation_mutation(individual)
+			case self.MUTATION.HOIST:
+				individual = t.hoist_mutation(individual)
+			case self.MUTATION.EXPANSION:
+				individual = t.expansion_mutation(individual)
+			case self.MUTATION.COLLAPSE:
+				individual = t.collapse_mutation(individual)
 
 		return individual
 

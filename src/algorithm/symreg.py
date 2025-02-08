@@ -8,6 +8,7 @@
 import tree.tree as t
 from utils.problemloader import Problem
 from enum import Enum
+import random
 
 
 class Symreg:
@@ -72,20 +73,44 @@ class Symreg:
 		for _ in range(self.POPULATION_SIZE):
 			self.population.append(t.Tree(x, y))
 		
-	def mutation(self, individual : t.Tree, mut_type : MUTATION):
-		match mut_type:
-			case self.MUTATION.SUBTREE:
-				pass
-			case self.MUTATION.POINT:
-				pass
-			case self.MUTATION.PERMUT:
-				pass
-			case self.MUTATION.HOIST:
-				pass
-			case self.MUTATION.EXPANSION:
-				pass
-			case self.MUTATION.COLLAPSE:
-				pass
-	
+	def mutation(self, 
+			  individual : t.Tree, 
+			  mut_type : MUTATION  = MUTATION.POINT,
+			  use_random_mutation_type : bool = False) -> t.Tree:
+		"""
+		Select and apply a mutation to an individual
+
+		:param individual:
+		:type individual: t.Tree
+
+		:param mut_type: The mutation used on the individual 
+		:type mut_type: MUTATION(enum)
+		W
+		:param use_random_mutation_type: If true ignore the mut_type and select<br/>randomly a mutation type with eaven<br/>probability.
+		:type use_random_mutation_type: bool
+		"""
+
+		if use_random_mutation_type:
+			# select random mutation type
+			random.randint(0, len(self.MUTATION) - 1)
+			pass
+		else:
+			# select mutation type
+			match mut_type:
+				case self.MUTATION.SUBTREE:
+					individual = t.subtree_mutation(individual)
+				case self.MUTATION.POINT:
+					individual = t.point_mutation(individual)
+				case self.MUTATION.PERMUT:
+					individual = t.permutation_mutation(individual)
+				case self.MUTATION.HOIST:
+					individual = t.hoist_mutation(individual)
+				case self.MUTATION.EXPANSION:
+					individual = t.expansion_mutation(individual)
+				case self.MUTATION.COLLAPSE:
+					individual = t.collapse_mutation(individual)
+
+		return individual
+
 	def _step():
 		pass

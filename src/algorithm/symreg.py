@@ -86,7 +86,7 @@ class Symreg:
 
 		# init population
 		for _ in range(self.POPULATION_SIZE):
-			self.population.append(t.Tree(x, y))
+			self.population.append(t.Tree(x, y, INIT_METHOD=t.INIT_METHOD.FULL))
 	
 	#tournament selection without replacement (try with replacement)
 	def _parent_selection(self, population : list[t.Tree]):
@@ -159,9 +159,9 @@ class Symreg:
 		match self.POP_MODEL:
 			case self.POPULTAION_MODEL.STEADY_STATE:
 				population.extend(offspring)
-				population.sort(key=lambda i : i._fitness, reverse=True)
+				population.sort(key=lambda i : i._fitness, reverse=False)
 			case self.POPULTAION_MODEL.GENERATIONAL:
-				population = sorted(offspring, key=lambda i : i._fitness, reverse=True)
+				population = sorted(offspring, key=lambda i : i._fitness, reverse=False)
 		
 		population = population[:self.POPULATION_SIZE]
 
@@ -175,7 +175,7 @@ class Symreg:
 			if best_solution._fitness < current_solution[0]._fitness:
 				best_solution = current_solution[0]
 			
-			if i % 50 == 0:
+			if i % 10 == 0:
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 		
 		self.problem.solution = best_solution

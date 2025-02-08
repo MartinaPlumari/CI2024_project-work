@@ -31,6 +31,7 @@ class Tree:
     _h: int
     _x: np.ndarray
     _y: np.ndarray
+    _fitness: float
      
     def __init__(self, x: np.ndarray, y: np.ndarray, init_method: init_method = init_method.GROW, depth: int = MAX_DEPTH):   
         self._root = Node('nan')
@@ -47,6 +48,7 @@ class Tree:
         
         self._root, self._n = create_random_tree(var, 0, depth, init_method)
         self._h = get_tree_height(self._root)
+        self._fitness = self.fitness
         
     def __str__(self):
         return str(self._root)
@@ -105,7 +107,6 @@ class Tree:
             if n[0] < 0:
                 break 
             self.insert_node(n, s, ins_node)   
-        
         
         return 
     
@@ -173,8 +174,8 @@ def crossover(t1: Tree, t2: Tree) -> Tree:
     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
     root1 = t1._root
 
-    n1 = rnd.randint(0, t1._n)
-    n2 = rnd.randint(0, t2._n)
+    n1 = rnd.randint(0, t1._n-1)
+    n2 = rnd.randint(0, t2._n-1)
     
     node = t2.get_node([n2])
     t1.insert_node([n1], root1, node)

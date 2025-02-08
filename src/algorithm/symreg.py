@@ -9,6 +9,7 @@ import tree.tree as t
 from utils.problemloader import Problem
 from enum import Enum
 import random
+import numpy as np
 
 
 class Symreg:
@@ -72,7 +73,12 @@ class Symreg:
 		# init population
 		for _ in range(self.POPULATION_SIZE):
 			self.population.append(t.Tree(x, y))
-		
+	
+	
+	def parent_selection(self):
+		candidates = sorted(np.random.choice(self.population, self.TOURNAMENT_SIZE), key=lambda x: x.fitness, reverse = True)
+		return candidates[0]
+ 	
 	def mutation(self, 
 			  individual : t.Tree, 
 			  mut_type : MUTATION  = MUTATION.POINT,

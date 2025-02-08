@@ -1,6 +1,7 @@
 import numpy as np
 import tree.tree as t
 from tree.node import Node
+import copy
 
 problem = np.load('../data/problem_0.npz')
 x = problem['x'] #variables
@@ -71,10 +72,25 @@ t2 = t.Tree(x, y)
 # print("Albero dopo la subtree mutation:")
 # print(t1)
 
-print("Albero 1 prima del crossover:")
-print(t1)
-print("Albero 2 prima del crossover:")
+# print("Albero 1 prima del crossover:")
+# print(t1)
+# print("Albero 2 prima del crossover:")
+# print(t2)
+# t1 = t.crossover(t1, t2)
+# print("Albero dopo il crossover:")
+# print(t1)
+
+
 print(t2)
-t1 = t.crossover(t1, t2)
-print("Albero dopo il crossover:")
 print(t1)
+
+t = t.crossover(t1,t2)
+print("t1")
+print(t1)
+print(t1._n)
+print("t2")
+print(t2)
+print(t2._n)
+print("t")
+print(t)
+print(t._n)

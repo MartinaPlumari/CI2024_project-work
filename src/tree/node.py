@@ -10,6 +10,7 @@ import numpy as np
 import random as rnd
 from typing import Callable
 from utils.arity import arity
+import copy
 
 class Node:
     _function: Callable
@@ -88,15 +89,6 @@ class Node:
     def __len__(self):
         return 1 + sum(len(s) for s in self._successors) 
     
-    def __copy__(self):
-        match self._type:
-            case 'f':
-                return Node(self._function, [s.__copy__() for s in self._successors])
-            case 'c':
-                return Node(float(self._str))
-            case 'v':
-                return Node(self._str)
-    
     @property
     def is_leaf(self):
         return self._leaf
@@ -114,3 +106,18 @@ class Node:
     
     def get_successors(self):
         return self._successors
+    
+
+def __deepcopy__(self, memo):
+        """Creates a deep copy of the current node and all its successors."""
+        # Copy the node itself
+        copied_node = Node(self._function if self._type == 'f' else self._value)
+        
+        # Copy successors recursively
+        copied_node._successors = [copy.deepcopy(s, memo) for s in self._successors]
+        
+        # Set parent references in copied successors
+        for child in copied_node._successors:
+            child._parent = copied_node
+        
+        return copied_node

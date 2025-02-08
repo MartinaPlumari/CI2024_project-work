@@ -88,29 +88,9 @@ class Tree:
         
         return None
     
-    # def insert_node(self, n: list, node: Node, ins_node: Node):
-        
-    #     if n[0] == 0:
-    #         if node.is_leaf:
-    #             n[0] += 1
-    #             return
-            
-    #         if node._successors:
-    #             print("Modifica del nodo...")
-    #             idx = rnd.randint(0, len(node._successors)-1)
-    #             node._successors[idx] = ins_node
-                
-    #         return 
-        
-
-    #     for s in node._successors:
-    #         n[0] -= 1
-    #         if n[0] < 0:
-    #             break 
-    #         self.insert_node(n, s, ins_node)   
-        
-    #     return 
-    
+    def deep_copy(self) -> 'Tree':
+        return copy.deepcopy(self)
+       
     
 def _get_subtree(bunch: set, node: Node):
     bunch.add(node)
@@ -170,55 +150,43 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = INIT_METHO
     return Node(func, successors), node_count
 
 
-# def crossover2(t1: Tree, t2: Tree) -> Tree:
-#     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
-#     root1 = t1._root
-
-#     n1 = rnd.randint(0, t1._n-1)
-#     n2 = rnd.randint(0, t2._n-1)
-    
-#     node = t2.get_node([n2])
-#     t1.insert_node([n1], root1, node)
-#     t1._n = count_nodes(t1._root)
-#     t1._h = get_tree_height(t1._root)
-    
-#     return t1
-
 def crossover(t1: Tree, t2: Tree) -> Tree:
     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
-    if t1._n < 2 or t2._n < 2:
-        return t1
-
-    n1 = rnd.randint(0, t1._n-1)
-    node1 = t1.get_node([n1])
+    t = t1.deep_copy()
     
-    while node1 is None or node1._parent is None or node1.short_name == 'np.absolute':
-        n1 = rnd.randint(0, t1._n-1)
-        node1 = t1.get_node([n1])
+    if t1._n < 2:
+        return t
+
+    # Select a random node from t1 (excluding the root)
+    n1 = rnd.randint(1, t._n - 1)  
+    node1 = t.get_node([n1])
+    
+    while node1 is None or node1._parent is None:
+        n1 = rnd.randint(1, t._n - 1)
+        node1 = t.get_node([n1])
     
     n2 = rnd.randint(0, t2._n-1)
     node2 = t2.get_node([n2])
     
-    while node2 is None or node2.is_leaf:
-        n2 = rnd.randint(0, t2._n-1)
+    while node2 is None:
+        n2 = rnd.randint(0, t2._n - 1)
         node2 = t2.get_node([n2])
     
-    #implementare copy
-    new_node = node2.__copy__()
-    new_node._parent = node1._parent
+    new_subtree = copy.deepcopy(node2)
+    parent = node1._parent
     
-    if node1._parent is None:
-        t1._root = new_node
+    if parent is not None:
+        new_subtree._parent = parent
+        parent._successors[parent._successors.index(node1)] = new_subtree
     else:
-        parent = node1._parent
-        parent._successors[parent._successors.index(node1)] = new_node
+        t = t1.deep_copy()
+        t._root = new_subtree
     
-
-    t1._h = get_tree_height(t1._root)
-    t1._n = count_nodes(t1._root)
-    t1._fitness = t1.fitness
+    t._h = get_tree_height(t._root)
+    t._n = count_nodes(t._root)
+    t._fitness = t.fitness
     
-    return t1
+    return t
 
 def point_mutation(t: Tree) -> Tree:
     """Performs a mutation by replacing a function node with a different random function."""

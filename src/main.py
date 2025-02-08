@@ -29,4 +29,4 @@ if __name__ == '__main__':
     alg : Symreg = Symreg(problem, 100, 100, 1_000, Symreg.MUTATION.POINT, Symreg.POPULTAION_MODEL.STEADY_STATE, 0.5, 3, False)
     alg.train()
 
-    #draw.draw_tree(alg.problem.solution._root)
+    draw.draw_tree(alg.problem.solution._root)

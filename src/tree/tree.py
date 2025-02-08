@@ -260,7 +260,7 @@ def hoist_mutation(t: Tree) -> Tree:
 def collapse_mutation(t: Tree) -> Tree:
     """Performs a collapse mutation by replacing a subtree with a leaf node."""
     
-    if t._n < 3:
+    if t._n < 4:
         return t
     
     n = rnd.randint(1, t._n-1)

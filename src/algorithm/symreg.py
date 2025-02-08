@@ -78,9 +78,11 @@ class Symreg:
 		for _ in range(self.POPULATION_SIZE):
 			self.population.append(t.Tree(x, y))
 	
+	#tournament selection without replacement (try with replacement)
 	def parent_selection(self):
-		candidates = sorted(np.random.choice(self.population, self.TOURNAMENT_SIZE), key=lambda x: x.fitness, reverse = True)
-		return candidates[0]
+		tournament_contestants = np.random.choice(self.population, self.TOURNAMENT_SIZE, replace=False) 
+		best_candidate = max(tournament_contestants, key=lambda x: x.fitness) 
+		return best_candidate
  	
 	def mutation(self, 
 			  individual : t.Tree, 

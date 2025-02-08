@@ -61,14 +61,16 @@ class Problem:
 
         elif self.use_validation_set:
             # set the train_size as a % of the validation size
+            x_data = data['x']
+            print(x_data.shape)
             self.valid_size = round(data_size / 100 * ratio)
             self.train_size = data_size - self.valid_size
             valid_indices = np.random.choice(self.train_size, size=self.valid_size, replace=False)
             train_indices = np.delete(np.arange(data_size), valid_indices)
             self.y_validation = data['y'][valid_indices]
-            self.x_validation = data['x'][valid_indices]
+            self.x_validation = data['x'][:, valid_indices]
             self.y_train = data['y'][train_indices]
-            self.x_train = data['x'][train_indices]
+            self.x_train = data['x'][:, train_indices]
             log = f"Problem N.{self.problem_id} loaded successfully --\nTRAIN SIZE:\t\t{self.train_size}\nVALIDATION SIZE:\t{self.valid_size}"
 
         print(log)

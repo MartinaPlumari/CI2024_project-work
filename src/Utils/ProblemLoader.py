@@ -25,29 +25,51 @@ class Problem:
     solution : str
 
     def __init__(self, path : str, id : int = -1, split : bool = False, ratio : int = 10):
+        
+        """ Takes a path to a .npz file and loads the data into the object.
+        
+        Parameters
+        ---
+        path : `str`
+            Path to the .npz file.
+        id : `int`
+            Problem ID.
+        split : `bool`
+            Wether to split or not the dataset in training and validation.
+        ratio : `int`
+            Percentage of the dataset to allocate for validation. The rest will be used training.
+        """
+        
         self.problem_id = id
         self.solution = ""
 
         # load dataset
         data = np.load(path)
 
-        self.x_train = data['x']
-        self.y_train = data['y']
-        
-        self.train_size = self.y_train.shape[0]
         self.use_validation_set = split
+        data_size = data['y'].shape[0]
+        
+        if not self.use_validation_set:
+            self.x_train = data['x']
+            self.y_train = data['y']
+            
+            self.train_size = data_size
+            
+            assert self.train_size > 0, "The problem is empty, please load a valid problem file."
+            
+            log = f"Problem N.{self.problem_id} loaded successfully --\nTRAIN SIZE:\t\t{self.train_size}"
 
-        assert self.train_size > 0, "The problem is empty, please load a valid problem file."
-
-        log = f"Problem N.{self.problem_id} loaded successfully --\nTRAIN SIZE:\t\t{self.train_size}"
-
-        if self.use_validation_set:
+        elif self.use_validation_set:
             # set the train_size as a % of the validation size
-            self.valid_size = round(self.train_size / 100 * ratio)
+            self.valid_size = round(data_size / 100 * ratio)
+            self.train_size = data_size - self.valid_size
             valid_indices = np.random.choice(self.train_size, size=self.valid_size, replace=False)
-            self.x_valid = self.x_train[:, valid_indices]
-            self.y_valid = self.y_train[valid_indices]
-            log += f"\nVALIDATION SIZE:\t{self.valid_size}\n"
+            train_indices = np.delete(np.arange(data_size), valid_indices)
+            self.y_validation = data['y'][valid_indices]
+            self.x_validation = data['x'][valid_indices]
+            self.y_train = data['y'][train_indices]
+            self.x_train = data['x'][train_indices]
+            log = f"Problem N.{self.problem_id} loaded successfully --\nTRAIN SIZE:\t\t{self.train_size}\nVALIDATION SIZE:\t{self.valid_size}"
 
         print(log)
 

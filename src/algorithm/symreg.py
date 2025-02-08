@@ -11,6 +11,8 @@ from enum import Enum
 import random
 import numpy as np
 import utils.draw as draw
+import matplotlib.pyplot as plt
+from itertools import accumulate
 
 
 class Symreg:
@@ -19,6 +21,7 @@ class Symreg:
 	# cost (using the fitness function inside tree)
 
 	problem : Problem
+	history : list[float]
 
 	# definire una classe quindi un tipo
 
@@ -30,8 +33,8 @@ class Symreg:
 		POINT = 1
 		PERMUT = 2
 		HOIST = 3
-		EXPANSION = 4
 		COLLAPSE = 5
+		# EXPANSION = 4
 	
 	class POPULTAION_MODEL(Enum):
 		STEADY_STATE = 0,
@@ -71,6 +74,8 @@ class Symreg:
 		self.TOURNAMENT_SIZE = tournament_size
 		self.USE_RAND_MUT_TYPE = use_random_mutation_type
 
+		self.history = list() 
+
 		# extract problem data
 		self.problem = problem
 		self.use_validation = problem.use_validation_set
@@ -104,24 +109,39 @@ class Symreg:
 
 		mut_type = self.MUTATION_TYPE
 
-		if self.USE_RAND_MUT_TYPE:
-			# select random mutation type
-			mut_type = random.choice(list(self.MUTATION))
-			
+		# if self.USE_RAND_MUT_TYPE:
+		# 	# select random mutation type
+		# 	mut_type = random.choice(list(self.MUTATION))
+		
+		if individual._h < 3:
+			individual = t.expansion_mutation(individual)
+		elif individual._h > 5:
+			individual = t.collapse_mutation(individual)
+			# mut_type = random.choice([0,1,2])
+			# match mut_type:
+			# 	case 0:
+			# 		individual = t.collapse_mutation(individual)
+			# 	case 1:
+			# 		individual = t.subtree_mutation(individual)
+			# 	case 2:
+			# 		individual = t.hoist_mutation(individual)
+		else:
+			individual = t.point_mutation(individual)
+
 		# select mutation type
-		match mut_type:
-			case self.MUTATION.SUBTREE:
-				individual = t.subtree_mutation(individual)
-			case self.MUTATION.POINT:
-				individual = t.point_mutation(individual)
-			case self.MUTATION.PERMUT:
-				individual = t.permutation_mutation(individual)
-			case self.MUTATION.HOIST:
-				individual = t.hoist_mutation(individual)
-			case self.MUTATION.EXPANSION:
-				individual = t.expansion_mutation(individual)
-			case self.MUTATION.COLLAPSE:
-				individual = t.collapse_mutation(individual)
+		# match mut_type:
+		# 	case self.MUTATION.SUBTREE:
+		# 		individual = t.subtree_mutation(individual)
+		# 	case self.MUTATION.POINT:
+		# 		individual = t.point_mutation(individual)
+		# 	case self.MUTATION.PERMUT:
+		# 		individual = t.permutation_mutation(individual)
+		# 	case self.MUTATION.HOIST:
+		# 		individual = t.hoist_mutation(individual)
+		# 	case self.MUTATION.COLLAPSE:
+		# 		individual = t.collapse_mutation(individual)
+			# case self.MUTATION.EXPANSION:
+			# 	individual = t.expansion_mutation(individual)
 
 		return individual
 
@@ -148,10 +168,10 @@ class Symreg:
 				
 				o : t.Tree = t.crossover(p1, p2)
 			
-		offspring.append(o)
+			offspring.append(o)
 
 		match self.POP_MODEL:
-			case self.POPULTAION_MODEL.STEADY_STATE:
+			case self.POPULTAION_MODEL.STEADY_STATE, default:
 				population.extend(offspring)
 				population.sort(key=lambda i : i._fitness, reverse=False)
 			case self.POPULTAION_MODEL.GENERATIONAL:
@@ -166,6 +186,7 @@ class Symreg:
 		best_solution : t.Tree = current_solution[0]
 		for i in range(self.MAX_GENERATIONS):
 			current_solution = self._step(current_solution)
+			self.history.append(current_solution[0]._fitness)
 			if best_solution._fitness < current_solution[0]._fitness:
 				best_solution = current_solution[0]
 			
@@ -173,3 +194,12 @@ class Symreg:
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 		
 		self.problem.solution = best_solution
+	
+	def plot_history(self) -> None:
+		plt.close('all')
+		plt.figure(figsize=(8, 6))
+		plt.scatter(
+			range(len(self.history)),
+			self.history
+		)
+		plt.show()

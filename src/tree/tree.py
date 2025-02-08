@@ -12,7 +12,7 @@ from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
+FUNCTIONS = [np.add, np.subtract, np.multiply]#, np.divide]#, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 3
 VARIABLE_P = 0.5
@@ -250,7 +250,7 @@ def permutation_mutation(t: Tree) -> Tree:
 def hoist_mutation(t: Tree) -> Tree:
     """Performs a hoist mutation by replacing the root node with a random subtree."""
     
-    if t._n < 3:
+    if t._n < 4:
         return t
     
     n = rnd.randint(1, t._n-1)
@@ -276,7 +276,7 @@ def collapse_mutation(t: Tree) -> Tree:
     n = rnd.randint(1, t._n-1)
     node = t.get_node([n])
     
-    while node is None or node.is_leaf or node._parent is None or node.short_name == 'np.absolute':
+    while node is None or node.is_leaf or node._parent is None:# or node.short_name == 'np.absolute':
         n = rnd.randint(1, t._n-1)
         node = t.get_node([n])
     
@@ -303,13 +303,13 @@ def collapse_mutation(t: Tree) -> Tree:
 def subtree_mutation(t: Tree) -> Tree:
     """Performs a subtree mutation by replacing a subtree with a one of its subtree."""
     
-    if t._n < 3:
+    if t._n < 4:
         return t
     
     n = rnd.randint(1, t._n-1)
     node = t.get_node([n])
     
-    while node is None or node.is_leaf or node.short_name == 'np.absolute':
+    while node is None or node.is_leaf: # or node.short_name == 'np.absolute':
         n = rnd.randint(1, t._n-1)
         node = t.get_node([n])
     

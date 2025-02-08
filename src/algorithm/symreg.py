@@ -47,7 +47,7 @@ class Symreg:
 			  population_size : int = 100, 
 			  offspring_size : int = 1_000, 
 			  max_generations : int = 1_000,
-			  mutation_type : MUTATION = MUTATION.SUBTREE,
+			  mutation_type : MUTATION = MUTATION.POINT,
 			  mutation_probability : float = 0.05,
 			  tournament_size : int = 3,
 			  epochs : int = 1_000) -> None:
@@ -71,6 +71,21 @@ class Symreg:
 		# init population
 		for _ in range(self.POPULATION_SIZE):
 			self.population.append(t.Tree(x, y))
+		
+	def mutation(self, individual : t.Tree, mut_type : MUTATION):
+		match mut_type:
+			case self.MUTATION.SUBTREE:
+				pass
+			case self.MUTATION.POINT:
+				pass
+			case self.MUTATION.PERMUT:
+				pass
+			case self.MUTATION.HOIST:
+				pass
+			case self.MUTATION.EXPANSION:
+				pass
+			case self.MUTATION.COLLAPSE:
+				pass
 	
 	def _step():
 		pass

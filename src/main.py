@@ -26,4 +26,4 @@ if __name__ == '__main__':
     saver = Saver(opt.out, opt.name, opt.id)
 
     problem : Problem = pl.problems[0]
-    alg : Symreg = Symreg(problem, Symreg.MUTATION.SUBTREE) 
+    alg : Symreg = Symreg(problem) 

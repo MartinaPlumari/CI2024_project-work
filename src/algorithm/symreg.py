@@ -43,10 +43,8 @@ class Symreg:
 	OFFSPRING_SIZE : int
 	MAX_GENERATIONS : int
 	MUTATION_PROBABILITY : float
-	GEN_OP_PROBABILITY : float
 	TOURNAMENT_SIZE : int
 	USE_RAND_MUT_TYPE : bool
-	EPOCHS : int
 	
 	
 	# fare in modo che in init vengano passati gli argmenti da linea di comando per decidere i vari iper parametri 
@@ -60,10 +58,8 @@ class Symreg:
 			  mutation_type : MUTATION = MUTATION.POINT,
 			  population_model : POPULTAION_MODEL = POPULTAION_MODEL.STEADY_STATE,
 			  mutation_probability : float = 0.05,
-			  gen_op_probability : float = 0.5,
 			  tournament_size : int = 3,
-			  use_random_mutation_type : bool = False,
-			  epochs : int = 1_000) -> None:
+			  use_random_mutation_type : bool = False) -> None:
 		
 		# initalize variables
 		self.POPULATION_SIZE = population_size
@@ -72,10 +68,8 @@ class Symreg:
 		self.MUTATION_TYPE = mutation_type
 		self.POP_MODEL = population_model
 		self.MUTATION_PROBABILITY = mutation_probability
-		self.GEN_OP_PROBABILITY = gen_op_probability
 		self.TOURNAMENT_SIZE = tournament_size
 		self.USE_RAND_MUT_TYPE = use_random_mutation_type
-		self.EPOCHS = epochs
 
 		# extract problem data
 		self.problem = problem
@@ -138,21 +132,21 @@ class Symreg:
 		"""
 		offspring : list[t.Tree] = list()
 		
-		for _ in range(self.OFFSPRING_SIZE):
-			p : t.Tree = self._parent_selection(population)
-			o : t.Tree = self._mutation(p)
-
 		# for _ in range(self.OFFSPRING_SIZE):
-		# 	if np.random.random() < self.GEN_OP_PROBABILITY:
-		# 		# MUTATION
-		# 		p : t.Tree = self._parent_selection(population)
-		# 		o : t.Tree = self._mutation(p)
-		# 	else:
-		# 		# RECOMBINATION
-		# 		p1 : t.Tree = self._parent_selection(population)
-		# 		p2 : t.Tree = self._parent_selection(population)
+		# 	p : t.Tree = self._parent_selection(population)
+		# 	o : t.Tree = self._mutation(p)
+
+		for _ in range(self.OFFSPRING_SIZE):
+			if np.random.random() <= self.MUTATION_PROBABILITY:
+				# MUTATION
+				p : t.Tree = self._parent_selection(population)
+				o : t.Tree = self._mutation(p)
+			else:
+				# RECOMBINATION
+				p1 : t.Tree = self._parent_selection(population)
+				p2 : t.Tree = self._parent_selection(population)
 				
-		# 		o : t.Tree = t.crossover(p1, p2)
+				o : t.Tree = t.crossover(p1, p2)
 			
 		offspring.append(o)
 
@@ -175,7 +169,7 @@ class Symreg:
 			if best_solution._fitness < current_solution[0]._fitness:
 				best_solution = current_solution[0]
 			
-			if i % 10 == 0:
+			if i % 50 == 0:
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 		
 		self.problem.solution = best_solution

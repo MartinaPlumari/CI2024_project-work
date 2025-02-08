@@ -26,7 +26,7 @@ if __name__ == '__main__':
     saver = Saver(opt.out, opt.name, opt.id)
 
     problem : Problem = pl.problems[0]
-    alg : Symreg = Symreg(problem, 100, 100, 500, Symreg.MUTATION.POINT, Symreg.POPULTAION_MODEL.STEADY_STATE, 0.05, 0.5, 3, False)
+    alg : Symreg = Symreg(problem, 100, 500, 1_000, Symreg.MUTATION.POINT, Symreg.POPULTAION_MODEL.STEADY_STATE, 0.5, 3, False)
     alg.train()
 
-    draw.draw_tree(alg.problem.solution._root)
+    #draw.draw_tree(alg.problem.solution._root)

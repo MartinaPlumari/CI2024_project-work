@@ -4,6 +4,3 @@
 
 import numpy as np
 
-def f1(x : np.ndarray) -> np.ndarray:
-	return np.tan(x[4])
-

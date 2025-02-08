@@ -5,7 +5,6 @@
 # at Politecnico di Torino.
 # ------------------------------------------------------
 
-import functools
 import tree.tree as t
 from utils.problemloader import Problem
 from enum import Enum
@@ -17,8 +16,10 @@ class Symreg:
 	# cost (using the fitness function inside tree)
 
 	problem : Problem
+
 	# definire una classe quindi un tipo
-	tree = None
+
+	population : list[t.Tree] = list()
 	use_validation : bool
 
 	class MUTATION(Enum):
@@ -29,32 +30,47 @@ class Symreg:
 		EXPANSION = 4
 		COLLAPSE = 5
 	
-	mutation_type : MUTATION = MUTATION.SUBTREE
-	POPULATION_SIZE : int = 100
-	OFFSPRING_SIZE : int = 1_000
-	MAX_GENERATIONS : int = 1_000
-	GEN_OP_PROBABILITY : float = 0.4
-	TOURNAMENT_SIZE : int = 3
-	EPOCHS : int = 1000
+	MUTATION_TYPE : MUTATION
+	POPULATION_SIZE : int
+	OFFSPRING_SIZE : int
+	MAX_GENERATIONS : int
+	MUTATION_PROBABILITY : float
+	TOURNAMENT_SIZE : int
+	EPOCHS : int
 	
 	
 	# fare in modo che in init vengano passati gli argmenti da linea di comando per decidere i vari iper parametri 
 	# e le strategie come ad esempio quale tipo di mutazione usare.
 
-	def __init__(self, problem : Problem, mutation_type : MUTATION = 0) -> None:
+	def __init__(self, 
+			  problem : Problem, 
+			  population_size : int = 100, 
+			  offspring_size : int = 1_000, 
+			  max_generations : int = 1_000,
+			  mutation_type : MUTATION = MUTATION.SUBTREE,
+			  mutation_probability : float = 0.05,
+			  tournament_size : int = 3,
+			  epochs : int = 1_000) -> None:
+		
+		# initalize variables
+		self.POPULATION_SIZE = population_size
+		self.OFFSPRING_SIZE = offspring_size
+		self.MAX_GENERATIONS = max_generations
+		self.MUTATION_TYPE = mutation_type
+		self.MUTATION_PROBABILITY = mutation_probability
+		self.TOURNAMENT_SIZE = tournament_size
+		self.EPOCHS = epochs
+
+		# extract problem data
 		self.problem = problem
-		self.use_validation = problem.use_train_set
+		self.use_validation = problem.use_validation_set
 		self.mutation_type = mutation_type
+		x = problem.x_train
+		y = problem.y_train
 
-		# tree initialization
-		x = problem.x_validation
-		y = problem.y_validation
-
-		var = list()
-		for i in range(x.shape[0]):
-			var.append('x' + str(i))
-
-		tree = t.create_random_tree(var)
+		# init population
+		for _ in range(self.POPULATION_SIZE):
+			self.population.append(t.Tree(x, y))
 	
 	def _step():
 		pass

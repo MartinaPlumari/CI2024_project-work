@@ -49,7 +49,6 @@ def compute_edges(node : Node, counter=[1], node_id_map={}, edges=[], labels={},
 
 
 def draw_tree(root : Node) -> None:
-	
 	(edges, labels) = compute_edges(root, parent_id=0)
 	edges.pop(0)
 	
@@ -64,5 +63,4 @@ def draw_tree(root : Node) -> None:
 	plt.figure(figsize=(8, 6))
 	nx.draw(G, pos, with_labels=False, node_color="lightblue", edge_color="black", node_size=1200, arrows=False)
 	nx.draw_networkx_labels(G, pos, labels=labels, font_size=12, font_color="black")
-
 	plt.show()

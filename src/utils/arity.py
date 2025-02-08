@@ -1,5 +1,11 @@
+# ------------------------------------------------------
+# This code is licensed under the MIT License.
+# Copyright (c) 2025 Martina Plumari, Daniel Bologna.
+# Developed for the course "Computational Intelligence" 
+# at Politecnico di Torino.
+# ------------------------------------------------------
+
 import re
-import inspect
 import numpy as np
 
 def get_function_signature(func) -> str:
@@ -7,12 +13,6 @@ def get_function_signature(func) -> str:
     Retrieve the signature of a given numpy function.
     Tries using inspect.signature, falls back to parsing docstrings or np.info.
     """
-    # Attempt to use inspect.signature
-    # try:
-    #     sig = inspect.signature(func)
-    #     return str(sig)
-    # except ValueError:
-    #     pass 
     
     # Attempt to parse the first line of the docstring
     if func.__doc__:

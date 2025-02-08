@@ -1,8 +1,15 @@
+# ------------------------------------------------------
+# This code is licensed under the MIT License.
+# Copyright (c) 2025 Martina Plumari, Daniel Bologna.
+# Developed for the course "Computational Intelligence" 
+# at Politecnico di Torino.
+# ------------------------------------------------------
+
 import numbers
 import numpy as np
 import random as rnd
 from typing import Callable
-from .utils import arity
+from utils.arity import arity
 
 class Node:
     _function: Callable

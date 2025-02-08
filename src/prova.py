@@ -1,7 +1,6 @@
 import numpy as np
 import tree.tree as t
 from tree.node import Node
-import random
 
 problem = np.load('../data/problem_0.npz')
 x = problem['x'] #variables

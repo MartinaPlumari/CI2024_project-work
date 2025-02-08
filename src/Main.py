@@ -7,10 +7,10 @@
 
 from tree.tree import Tree
 
-import Utils.ArgParser as ap
-from Utils.ProblemLoader import ProblemList, Problem
-from Utils.Saver import Saver
-import Utils.Draw as draw
+import utils.argparser as ap
+from utils.problemloader import ProblemList, Problem
+from utils.saver import Saver
+import utils.draw as draw
 
 
 #!/usr/bin/python3
@@ -24,19 +24,8 @@ if __name__ == '__main__':
     # save the problems solution in the s310582.py file
     saver = Saver(opt.out, opt.name, opt.id)
 
-    for problem in pl.problems:
-        # tree gen
-        tree = Tree(problem.x_train, problem.y_train)
-
-        print(tree)
-
-        # algorithm
-        problem.solution = tree
-
-        # execture algorithm
-
-        # save solution 
-        saver.append_solution(problem)
-
-        # plotting & Draw best solution
-        draw.draw_tree(tree._root)
+    problem : Problem = pl.problems[1]
+    tree = Tree(problem.x_train, problem.y_train)
+    draw.draw_tree(tree._root)
+    problem.solution = tree
+    saver.append_solution(problem)

@@ -5,7 +5,7 @@
 # at Politecnico di Torino.
 # ------------------------------------------------------
 
-from Utils.ProblemLoader import Problem
+from utils.problemloader import Problem
 import re
 
 class Saver:

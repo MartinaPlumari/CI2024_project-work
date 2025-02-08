@@ -7,7 +7,7 @@
 
 import functools
 import tree.tree as t
-from Utils.ProblemLoader import Problem
+from utils.problemloader import Problem
 from enum import Enum
 
 

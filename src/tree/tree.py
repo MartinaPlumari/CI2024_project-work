@@ -1,9 +1,14 @@
-import sys
-import numbers
+# ------------------------------------------------------
+# This code is licensed under the MIT License.
+# Copyright (c) 2025 Martina Plumari, Daniel Bologna.
+# Developed for the course "Computational Intelligence" 
+# at Politecnico di Torino.
+# ------------------------------------------------------
+
 import numpy as np
 import random as rnd
-from .node import Node
-from .utils import arity
+from tree.node import Node
+from utils.arity import arity
 
 FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp 
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
@@ -12,10 +17,13 @@ VARIABLE_P = 0.5
 EARLY_STOP_P = 0.1
 
 class Tree:
+    """
+    TODO
+    """
     _root: Node
     _n: int
     _h: int
-    _x: np.ndarray #capire se ha senso mettere le variabili come attributi della classe
+    _x: np.ndarray
     _y: np.ndarray
     
     def __init__(self, x: np.ndarray, y: np.ndarray):

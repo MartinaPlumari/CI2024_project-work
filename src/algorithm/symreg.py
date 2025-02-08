@@ -84,7 +84,7 @@ class Symreg:
 		best_candidate = max(tournament_contestants, key=lambda x: x.fitness) 
 		return best_candidate
  	
-	def mutation(self, 
+	def _mutation(self, 
 			  individual : t.Tree, 
 			  mut_type : MUTATION  = MUTATION.POINT,
 			  use_random_mutation_type : bool = False) -> t.Tree:
@@ -96,7 +96,7 @@ class Symreg:
 
 		:param mut_type: The mutation used on the individual 
 		:type mut_type: MUTATION(enum)
-		W
+
 		:param use_random_mutation_type: If true ignore the mut_type and select<br/>randomly a mutation type with eaven<br/>probability.
 		:type use_random_mutation_type: bool
 		"""
@@ -122,5 +122,10 @@ class Symreg:
 
 		return individual
 
-	def _step():
+	def _step(self) -> None:
+		pass
+	
+	def train(self) -> None:
+		
+		
 		pass

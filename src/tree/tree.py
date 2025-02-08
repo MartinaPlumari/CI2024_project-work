@@ -10,6 +10,7 @@ import random as rnd
 from enum import Enum 
 from tree.node import Node
 from utils.arity import arity
+import copy
 
 FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp 
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
@@ -87,31 +88,30 @@ class Tree:
         
         return None
     
-    def insert_node(self, n: list, parent: Node, ins_node: Node):
+    # def insert_node(self, n: list, node: Node, ins_node: Node):
         
-        if n[0] == 0:
-            if parent.is_leaf:
-                n[0] += 1
-                return
+    #     if n[0] == 0:
+    #         if node.is_leaf:
+    #             n[0] += 1
+    #             return
             
-            if parent._successors:
-                print("Modifica del nodo...")
-                idx = rnd.randint(0, len(parent._successors)-1)
-                parent._successors[idx] = ins_node
+    #         if node._successors:
+    #             print("Modifica del nodo...")
+    #             idx = rnd.randint(0, len(node._successors)-1)
+    #             node._successors[idx] = ins_node
                 
-            return 
+    #         return 
         
 
-        for s in parent._successors:
-            n[0] -= 1
-            if n[0] < 0:
-                break 
-            self.insert_node(n, s, ins_node)   
+    #     for s in node._successors:
+    #         n[0] -= 1
+    #         if n[0] < 0:
+    #             break 
+    #         self.insert_node(n, s, ins_node)   
         
-        return 
+    #     return 
     
     
-
 def _get_subtree(bunch: set, node: Node):
     bunch.add(node)
     for c in node._successors:
@@ -170,17 +170,52 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = init_metho
     return Node(func, successors), node_count
 
 
+# def crossover2(t1: Tree, t2: Tree) -> Tree:
+#     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
+#     root1 = t1._root
+
+#     n1 = rnd.randint(0, t1._n-1)
+#     n2 = rnd.randint(0, t2._n-1)
+    
+#     node = t2.get_node([n2])
+#     t1.insert_node([n1], root1, node)
+#     t1._n = count_nodes(t1._root)
+#     t1._h = get_tree_height(t1._root)
+    
+#     return t1
+
 def crossover(t1: Tree, t2: Tree) -> Tree:
     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
-    root1 = t1._root
 
     n1 = rnd.randint(0, t1._n-1)
-    n2 = rnd.randint(0, t2._n-1)
+    node1 = t1.get_node([n1])
     
-    node = t2.get_node([n2])
-    t1.insert_node([n1], root1, node)
-    t1._n = count_nodes(t1._root)
+    while node1 is None and node1.short_name == 'np.absolute':
+        n1 = rnd.randint(0, t1._n-1)
+        node1 = t1.get_node([n1])
+    
+    n2 = rnd.randint(0, t2._n-1)
+    node2 = t2.get_node([n2])
+    
+    while node2 is None:
+        n2 = rnd.randint(0, t2._n-1)
+        node2 = t2.get_node([n2])
+    
+    print(f"Node1: {node1.short_name} Node2: {node2.short_name}")
+    #implementare copy
+    new_node = copy.deepcopy(node2)
+    new_node._parent = node1._parent
+    
+    if node1._parent is None:
+        t1._root = new_node
+    else:
+        parent = node1._parent
+        parent._successors[parent._successors.index(node1)] = new_node
+    
+
     t1._h = get_tree_height(t1._root)
+    t1._n = count_nodes(t1._root)
+    t1._fitness = t1.fitness
     
     return t1
 
@@ -222,6 +257,8 @@ def point_mutation(t: Tree) -> Tree:
         new_node._parent = parent
         node._parent._successors[parent._successors.index(node)] = new_node  
 
+    t._fitness = t.fitness
+    
     return t
 
 def permutation_mutation(t: Tree) -> Tree:
@@ -236,6 +273,8 @@ def permutation_mutation(t: Tree) -> Tree:
     node1 = t.get_node([n1])
     
     node1._successors = node1._successors[::-1]
+    
+    t._fitness = t.fitness
     
     return t
 
@@ -255,6 +294,7 @@ def hoist_mutation(t: Tree) -> Tree:
     t._root = node
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
+    t._fitness = t.fitness
     
     return t
 
@@ -287,6 +327,7 @@ def collapse_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
+    t._fitness = t.fitness
     
     return t
 
@@ -310,6 +351,7 @@ def subtree_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
+    t._fitness = t.fitness
     
     return t
 
@@ -335,6 +377,7 @@ def expansion_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
+    t._fitness = t.fitness
     
     return t
 
@@ -361,4 +404,7 @@ def simplify_tree(t: Tree) -> Tree:
         return node  
 
     t._root = simplify_node(t._root) 
+    t._h = get_tree_height(t._root)
+    t._n = count_nodes(t._root)
+    t._fitness = t.fitness
     return t

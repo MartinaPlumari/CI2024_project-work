@@ -87,7 +87,7 @@ class Node:
     
     def __len__(self):
         return 1 + sum(len(s) for s in self._successors) 
-
+    
     @property
     def is_leaf(self):
         return self._leaf

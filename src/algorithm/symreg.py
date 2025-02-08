@@ -33,11 +33,17 @@ class Symreg:
 		EXPANSION = 4
 		COLLAPSE = 5
 	
+	class POPULTAION_MODEL(Enum):
+		STEADY_STATE = 0,
+		GENERATIONAL = 1
+	
 	MUTATION_TYPE : MUTATION
+	POP_MODEL : MUTATION
 	POPULATION_SIZE : int
 	OFFSPRING_SIZE : int
 	MAX_GENERATIONS : int
 	MUTATION_PROBABILITY : float
+	GEN_OP_PROBABILITY : float
 	TOURNAMENT_SIZE : int
 	USE_RAND_MUT_TYPE : bool
 	EPOCHS : int
@@ -52,7 +58,9 @@ class Symreg:
 			  offspring_size : int = 1_000, 
 			  max_generations : int = 1_000,
 			  mutation_type : MUTATION = MUTATION.POINT,
+			  population_model : POPULTAION_MODEL = POPULTAION_MODEL.STEADY_STATE,
 			  mutation_probability : float = 0.05,
+			  gen_op_probability : float = 0.5,
 			  tournament_size : int = 3,
 			  use_random_mutation_type : bool = False,
 			  epochs : int = 1_000) -> None:
@@ -62,7 +70,9 @@ class Symreg:
 		self.OFFSPRING_SIZE = offspring_size
 		self.MAX_GENERATIONS = max_generations
 		self.MUTATION_TYPE = mutation_type
+		self.POP_MODEL = population_model
 		self.MUTATION_PROBABILITY = mutation_probability
+		self.GEN_OP_PROBABILITY = gen_op_probability
 		self.TOURNAMENT_SIZE = tournament_size
 		self.USE_RAND_MUT_TYPE = use_random_mutation_type
 		self.EPOCHS = epochs
@@ -79,15 +89,12 @@ class Symreg:
 			self.population.append(t.Tree(x, y))
 	
 	#tournament selection without replacement (try with replacement)
-	def parent_selection(self):
-		tournament_contestants = np.random.choice(self.population, self.TOURNAMENT_SIZE, replace=False) 
+	def _parent_selection(self, population : list[t.Tree]):
+		tournament_contestants = np.random.choice(population, self.TOURNAMENT_SIZE, replace=False) 
 		best_candidate = max(tournament_contestants, key=lambda x: x.fitness) 
 		return best_candidate
  	
-	def _mutation(self, 
-			  individual : t.Tree, 
-			  mut_type : MUTATION  = MUTATION.POINT,
-			  use_random_mutation_type : bool = False) -> t.Tree:
+	def _mutation(self, individual : t.Tree) -> t.Tree:
 		"""
 		Select and apply a mutation to an individual
 
@@ -101,7 +108,9 @@ class Symreg:
 		:type use_random_mutation_type: bool
 		"""
 
-		if use_random_mutation_type:
+		mut_type = self.MUTATION_TYPE
+
+		if self.USE_RAND_MUT_TYPE:
 			# select random mutation type
 			mut_type = random.choice(list(self.MUTATION))
 			
@@ -122,10 +131,39 @@ class Symreg:
 
 		return individual
 
-	def _step(self) -> None:
-		pass
+
+	def _step(self, population : list[t.Tree]) -> None:
+		"""
+		Use hyper modern approach
+		"""
+		offspring : list[t.Tree] = list()
+
+		for _ in range(self.OFFSPRING_SIZE):
+			if np.random.random() < self.GEN_OP_PROBABILITY:
+				# MUTATION
+				p : t.Tree = self._parent_selection(population)
+				o : t.Tree = self._mutation(p)
+			else:
+				# RECOMBINATION
+				p1 : t.Tree = self._parent_selection(population)
+				p2 : t.Tree = self._parent_selection(population)
+				
+				o : t.Tree = t.crossover(p1, p2)
+			
+			offspring.append(o)
+
+		match self.POP_MODEL:
+			case self.POPULTAION_MODEL.STEADY_STATE:
+				population.extend(offspring)
+				population.sort(key=lambda i : i._fitness, reverse=True)
+			case self.POPULTAION_MODEL.GENERATIONAL:
+				population = sorted(offspring, key=lambda i : i._fitness, reverse=True)
+		
+		population = population[:self.POPULATION_SIZE]
+
+		return population
 	
 	def train(self) -> None:
-		
-		
-		pass
+		current_solution : list[t.Tree] = self.population.copy()
+		for i in range(self.MAX_GENERATIONS):
+			current_solution = self._step(current_solution)

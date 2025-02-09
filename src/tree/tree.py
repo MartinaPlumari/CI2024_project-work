@@ -12,7 +12,7 @@ from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide]#, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
+FUNCTIONS = [np.add, np.subtract, np.multiply]#, np.divide]#, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
 CONSTANT_RANGE = (-1, 1) #could be an eccessive limitation
 MAX_DEPTH = 3
 VARIABLE_P = 0.5
@@ -37,14 +37,13 @@ class Tree:
     def __init__(self, x: np.ndarray, y: np.ndarray, INIT_METHOD: INIT_METHOD = INIT_METHOD.GROW, depth: int = MAX_DEPTH):   
         self._root = Node('nan')
         self._n = 0
-        self._n_var = 0
         self._x = x
         self._y = y
+        self._kwargs : dict = {f'x{i}': self._x[i] for i in range(self._x.shape[0])}
         
         var = []
-        self._n_var = x.shape[0]
         
-        for i in range(self._n_var):
+        for i in range(self._x.shape[0]):
             var.append(f'x{str(i)}')
         
         self._root, self._n = create_random_tree(var, 0, depth, INIT_METHOD)
@@ -55,8 +54,7 @@ class Tree:
         return str(self._root)
     
     def __call__(self):
-        kwargs = {f'x{i}': self._x[i] for i in range(self._n_var)}
-        return self._root(**kwargs)
+        return self._root(**self._kwargs)
     
     @property
     def subtree(self):
@@ -66,11 +64,9 @@ class Tree:
         
     #cumulative fitness on all the dataset
     @property
-    def fitness(self) -> float:
-        kwargs = {f'x{i}': self._x[i] for i in range(self._n_var)}
-        
-        t = np.nan_to_num(self._root(**kwargs), nan = -10) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
-        return - 100*np.square(self._y-t).sum()/len(self._y)
+    def fitness(self) -> float:        
+        t = np.nan_to_num(self._root(**self._kwargs), nan = -1) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
+        return - np.square(self._y-t).sum()/len(self._y)# 100*np.square(self._y-t).sum()/len(self._y)
     
     def get_node(self, n: list, node: Node = None) -> Node:
         if node is None:
@@ -89,7 +85,13 @@ class Tree:
         return None
     
     def deep_copy(self) -> 'Tree':
-        return copy.deepcopy(self)
+        new_tree = Tree(self._x, self._y)
+        new_tree._root = self._root.copy()
+        new_tree._n = self._n
+        new_tree._h = self._h
+        new_tree._fitness = self._fitness
+        new_tree._kwargs = self._kwargs
+        return new_tree
        
     
 def _get_subtree(bunch: set, node: Node):
@@ -184,7 +186,7 @@ def crossover(t1: Tree, t2: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    t._fitness = t.fitness
+    
     
     return t
 
@@ -226,7 +228,7 @@ def point_mutation(t: Tree) -> Tree:
         new_node._parent = parent
         node._parent._successors[parent._successors.index(node)] = new_node  
 
-    t._fitness = t.fitness
+    
     
     return t
 
@@ -243,7 +245,7 @@ def permutation_mutation(t: Tree) -> Tree:
     
     node1._successors = node1._successors[::-1]
     
-    t._fitness = t.fitness
+    
     
     return t
 
@@ -263,7 +265,7 @@ def hoist_mutation(t: Tree) -> Tree:
     t._root = node
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    t._fitness = t.fitness
+    
     
     return t
 
@@ -281,7 +283,7 @@ def collapse_mutation(t: Tree) -> Tree:
         node = t.get_node([n])
     
     var = []
-    for i in range(t._n_var):
+    for i in range(t._x.shape[0]):
         var.append(f'x{str(i)}')
     
     if rnd.random() < VARIABLE_P:
@@ -296,7 +298,7 @@ def collapse_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    t._fitness = t.fitness
+    
     
     return t
 
@@ -320,7 +322,7 @@ def subtree_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    t._fitness = t.fitness
+    
     
     return t
 
@@ -335,7 +337,7 @@ def expansion_mutation(t: Tree) -> Tree:
         node = t.get_node([n])
     
     var = []
-    for i in range(t._n_var):
+    for i in range(t._x.shape[0]):
         var.append(f'x{str(i)}')
     
     new_node, _ = create_random_tree(var, 0, rnd.randint(1, MAX_DEPTH))
@@ -346,7 +348,7 @@ def expansion_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    t._fitness = t.fitness
+    
     
     return t
 
@@ -375,5 +377,5 @@ def simplify_tree(t: Tree) -> Tree:
     t._root = simplify_node(t._root) 
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    t._fitness = t.fitness
+    
     return t

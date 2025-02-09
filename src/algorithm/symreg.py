@@ -90,8 +90,8 @@ class Symreg:
 	#tournament selection without replacement (try with replacement)
 	def _parent_selection(self, population : list[t.Tree]):
 		tournament_contestants = np.random.choice(population, self.TOURNAMENT_SIZE, replace=False) 
-		best_candidate = max(tournament_contestants, key=lambda x: x._fitness) 
-		return best_candidate
+		best_candidate : t.Tree = max(tournament_contestants, key=lambda x: x._fitness) 
+		return best_candidate##.deep_copy()
  	
 	def _mutation(self, individual : t.Tree) -> t.Tree:
 		"""
@@ -109,39 +109,39 @@ class Symreg:
 
 		mut_type = self.MUTATION_TYPE
 
-		# if self.USE_RAND_MUT_TYPE:
-		# 	# select random mutation type
-		# 	mut_type = random.choice(list(self.MUTATION))
+		if self.USE_RAND_MUT_TYPE:
+			# select random mutation type
+			mut_type = random.choice(list(self.MUTATION))
 		
-		if individual._h < 3:
-			individual = t.expansion_mutation(individual)
-		elif individual._h > 6:
-			individual = t.collapse_mutation(individual)
-			# mut_type = random.choice([0,1,2])
-			# match mut_type:
-			# 	case 0:
-			# 		individual = t.collapse_mutation(individual)
-			# 	case 1:
-			# 		individual = t.subtree_mutation(individual)
-			# 	case 2:
-			# 		individual = t.hoist_mutation(individual)
-		else:
-			individual = t.point_mutation(individual)
+		# if individual._h < 3:
+		# 	individual = t.expansion_mutation(individual)
+		# elif individual._h > 6:
+		# 	individual = t.collapse_mutation(individual)
+		# 	# mut_type = random.choice([0,1,2])
+		# 	# match mut_type:
+		# 	# 	case 0:
+		# 	# 		individual = t.collapse_mutation(individual)
+		# 	# 	case 1:
+		# 	# 		individual = t.subtree_mutation(individual)
+		# 	# 	case 2:
+		# 	# 		individual = t.hoist_mutation(individual)
+		# else:
+		# 	individual = t.point_mutation(individual)
 
 		# select mutation type
-		# match mut_type:
-		# 	case self.MUTATION.SUBTREE:
-		# 		individual = t.subtree_mutation(individual)
-		# 	case self.MUTATION.POINT:
-		# 		individual = t.point_mutation(individual)
-		# 	case self.MUTATION.PERMUT:
-		# 		individual = t.permutation_mutation(individual)
-		# 	case self.MUTATION.HOIST:
-		# 		individual = t.hoist_mutation(individual)
-		# 	case self.MUTATION.COLLAPSE:
-		# 		individual = t.collapse_mutation(individual)
-			# case self.MUTATION.EXPANSION:
-			# 	individual = t.expansion_mutation(individual)
+		match mut_type:
+			case self.MUTATION.SUBTREE:
+				individual = t.subtree_mutation(individual)
+			case self.MUTATION.POINT:
+				individual = t.point_mutation(individual)
+			case self.MUTATION.PERMUT:
+				individual = t.permutation_mutation(individual)
+			case self.MUTATION.HOIST:
+				individual = t.hoist_mutation(individual)
+			case self.MUTATION.COLLAPSE:
+				individual = t.collapse_mutation(individual)
+			case self.MUTATION.EXPANSION:
+				individual = t.expansion_mutation(individual)
 
 		return individual
 
@@ -151,10 +151,6 @@ class Symreg:
 		Use hyper modern approach
 		"""
 		offspring : list[t.Tree] = list()
-		
-		# for _ in range(self.OFFSPRING_SIZE):
-		# 	p : t.Tree = self._parent_selection(population)
-		# 	o : t.Tree = self._mutation(p)
 
 		for _ in range(self.OFFSPRING_SIZE):
 			if np.random.random() <= self.MUTATION_PROBABILITY:
@@ -166,14 +162,12 @@ class Symreg:
 				p1 : t.Tree = self._parent_selection(population)
 				p2 : t.Tree = self._parent_selection(population)
 				
-				if p1._h > 10 or p2._h > 10:
-					o : t.Tree = self._mutation(p1)
-				else:
-					o : t.Tree = t.crossover(p1, p2)
-
-
+				o : t.Tree = t.crossover(p1, p2)
 			
 			offspring.append(o)
+		
+		for child in offspring:
+			child._fitness = child.fitness
 
 		match self.POP_MODEL:
 			case self.POPULTAION_MODEL.STEADY_STATE, default:
@@ -187,13 +181,13 @@ class Symreg:
 		return population
 	
 	def train(self) -> None:
-		current_solution : list[t.Tree] = self.population.copy()
-		best_solution : t.Tree = current_solution[0].deep_copy()
+		current_population : list[t.Tree] = self.population
+		best_solution : t.Tree = current_population[0].deep_copy()
 		for i in range(self.MAX_GENERATIONS):
-			current_solution = self._step(current_solution)
-			self.history.append(current_solution[0]._fitness)
-			if best_solution._fitness < current_solution[0]._fitness:
-				best_solution = current_solution[0].deep_copy()
+			current_population = self._step(current_population)
+			self.history.append(current_population[0]._fitness)
+			if best_solution._fitness < current_population[0]._fitness:
+				best_solution = current_population[0].deep_copy()
 			
 			if i % 50 == 0:
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
@@ -203,13 +197,13 @@ class Symreg:
 	def plot_history(self) -> None:
 		plt.close('all')
 		plt.figure(figsize=(8, 6))
-		plt.plot(
-			range(len(self.history)),
-			list(accumulate(self.history, max)),
-			color="red"
-		)
-		# plt.scatter(
+		# plt.plot(
 		# 	range(len(self.history)),
-		# 	self.history
+		# 	list(accumulate(self.history, max)),
+		# 	color="red"
 		# )
+		plt.scatter(
+			range(len(self.history)),
+			self.history
+		)
 		plt.show()

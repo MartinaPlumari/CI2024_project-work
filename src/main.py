@@ -26,7 +26,7 @@ if __name__ == '__main__':
     saver = Saver(opt.out, opt.name, opt.id)
 
     problem : Problem = pl.problems[0]
-    alg : Symreg = Symreg(problem, 500, 500, 1_000, Symreg.MUTATION.POINT, Symreg.POPULTAION_MODEL.STEADY_STATE, 0.05, 3, False)
+    alg : Symreg = Symreg(problem, 10, 100, 100, Symreg.MUTATION.HOIST, Symreg.POPULTAION_MODEL.GENERATIONAL, 0.05, 3, False)
     alg.train()
 
     print(f"RESULT: {alg.problem.solution._root}\nFITNESS: {alg.problem.solution._fitness}")

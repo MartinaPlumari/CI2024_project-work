@@ -11,6 +11,7 @@ import random as rnd
 from typing import Callable
 from utils.arity import arity
 import copy
+import json
 
 class Node:
     _function: Callable
@@ -108,16 +109,57 @@ class Node:
         return self._successors
     
 
-def __deepcopy__(self, memo):
-        """Creates a deep copy of the current node and all its successors."""
-        # Copy the node itself
-        copied_node = Node(self._function if self._type == 'f' else self._value)
+    def __deepcopy__(self, memo):
+        """Crea una copia profonda del nodo e dei suoi successori."""
+        if id(self) in memo:
+            return memo[id(self)]
         
-        # Copy successors recursively
+        # Creiamo un nuovo nodo in base al tipo
+        if self._type == 'c':  # Costante
+            copied_node = Node(float(self._str))
+        elif self._type == 'v':  # Variabile
+            copied_node = Node(self._str)
+        else:  # Funzione
+            copied_node = Node(self._function, name=self._str)  # Mantiene il nome
+        
+        # Copiamo gli attributi fondamentali
+        copied_node._arity = self._arity
+        copied_node._type = self._type
+        copied_node._leaf = self._leaf
+        copied_node._str = self._str
+        copied_node._parent = None  # La parent verrà aggiornata in seguito
+        
+        # Copia ricorsiva dei successori
         copied_node._successors = [copy.deepcopy(s, memo) for s in self._successors]
         
-        # Set parent references in copied successors
+        # Aggiorniamo i riferimenti al parent nei successori copiati
         for child in copied_node._successors:
             child._parent = copied_node
         
+        # Memorizziamo la copia nel memo per evitare duplicazioni
+        memo[id(self)] = copied_node
         return copied_node
+    
+    def copy(self):
+        # Crea una copia del nodo corrente senza parent e successori
+
+        if self._function is None:
+            return None
+        
+        new_node = Node(
+            node=self._function, 
+            successors=[], 
+            name=self._str
+        )
+        new_node._type = self._type
+        new_node._arity = self._arity
+        new_node._leaf = self._leaf
+        
+        # Copia i successori ricorsivamente
+        new_node._successors = [child.copy() for child in self._successors]
+        
+        # Imposta il parent per i nuovi successori
+        for child in new_node._successors:
+            child._parent = new_node
+        
+        return new_node

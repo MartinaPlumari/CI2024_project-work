@@ -36,19 +36,24 @@ class Symreg:
 		EXPANSION = 4
 		COLLAPSE = 5
 	
-	class POPULTAION_MODEL(Enum):
+	class POPULATION_MODEL(Enum):
 		STEADY_STATE = 0,
 		GENERATIONAL = 1
+  
+	class INIT_METHOD(Enum):
+		GROW = 0
+		FULL = 1
+		HALF_HALF = 2
 	
 	MUTATION_TYPE : MUTATION
-	POP_MODEL : MUTATION
+	POP_MODEL : POPULATION_MODEL
+	POP_INIT_METHOD : INIT_METHOD
 	POPULATION_SIZE : int
 	OFFSPRING_SIZE : int
 	MAX_GENERATIONS : int
 	MUTATION_PROBABILITY : float
 	TOURNAMENT_SIZE : int
 	USE_RAND_MUT_TYPE : bool
-	
 	
 	# fare in modo che in init vengano passati gli argmenti da linea di comando per decidere i vari iper parametri 
 	# e le strategie come ad esempio quale tipo di mutazione usare.
@@ -59,7 +64,8 @@ class Symreg:
 			  offspring_size : int = 1_000, 
 			  max_generations : int = 1_000,
 			  mutation_type : MUTATION = MUTATION.POINT,
-			  population_model : POPULTAION_MODEL = POPULTAION_MODEL.STEADY_STATE,
+			  population_model : POPULATION_MODEL = POPULATION_MODEL.STEADY_STATE,
+			  population_init_method : INIT_METHOD = INIT_METHOD.HALF_HALF,
 			  mutation_probability : float = 0.05,
 			  tournament_size : int = 3,
 			  use_random_mutation_type : bool = False) -> None:
@@ -70,6 +76,7 @@ class Symreg:
 		self.MAX_GENERATIONS = max_generations
 		self.MUTATION_TYPE = mutation_type
 		self.POP_MODEL = population_model
+		self.POP_INIT_METHOD = population_init_method
 		self.MUTATION_PROBABILITY = mutation_probability
 		self.TOURNAMENT_SIZE = tournament_size
 		self.USE_RAND_MUT_TYPE = use_random_mutation_type
@@ -84,12 +91,17 @@ class Symreg:
 		y = problem.y_train
 
 		# init population
-		for _ in range(self.POPULATION_SIZE):
-			self.population.append(t.Tree(x, y, INIT_METHOD=t.INIT_METHOD.FULL))
+		if self.POP_INIT_METHOD == self.INIT_METHOD.HALF_HALF:
+			for _ in range(self.POPULATION_SIZE//2):
+				self.population.append(t.Tree(x, y, INIT_METHOD=t.INIT_METHOD.FULL))
+				self.population.append(t.Tree(x, y, INIT_METHOD=t.INIT_METHOD.GROW))
+		else:
+			for _ in range(self.POPULATION_SIZE):
+				self.population.append(t.Tree(x, y, INIT_METHOD=self.POP_INIT_METHOD))
 	
 	#tournament selection without replacement (try with replacement)
 	def _parent_selection(self, population : list[t.Tree]):
-		tournament_contestants = np.random.choice(population, self.TOURNAMENT_SIZE, replace=False) 
+		tournament_contestants = random.sample(population, self.TOURNAMENT_SIZE) 
 		best_candidate : t.Tree = max(tournament_contestants, key=lambda x: x._fitness) 
 		return best_candidate##.deep_copy()
  	
@@ -168,10 +180,10 @@ class Symreg:
 			child._fitness = child.fitness
 		
 		match self.POP_MODEL:
-			case self.POPULTAION_MODEL.STEADY_STATE, default:
+			case self.POPULATION_MODEL.STEADY_STATE, default:
 				population.extend(offspring)
 				population.sort(key=lambda i : i._fitness, reverse=False)
-			case self.POPULTAION_MODEL.GENERATIONAL:
+			case self.POPULATION_MODEL.GENERATIONAL:
 				population = sorted(offspring, key=lambda i : i._fitness, reverse=False)
 			
 		population = population[:self.POPULATION_SIZE]

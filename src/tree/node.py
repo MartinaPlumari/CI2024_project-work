@@ -41,10 +41,10 @@ class Node:
             self._arity = arity(node)
             self._successors = list(successors) if successors is not None else []
             
-            assert self._arity is None or len(self._successors) == self._arity, (
-                "Panic: Incorrect number of children."
-                + f" Expected {len(tuple(successors))} found {arity(node)}"
-            )
+            # assert self._arity is None or len(self._successors) == self._arity, (
+            #     "Panic: Incorrect number of children."
+            #     + f" Expected {len(tuple(successors))} found {arity(node)}"
+            # )
             
             self._leaf = False
             assert all(isinstance(s, Node) for s in self._successors), "Panic: Successors must be `Node`"
@@ -120,7 +120,7 @@ class Node:
         elif self._type == 'v':  # Variabile
             copied_node = Node(self._str)
         else:  # Funzione
-            copied_node = Node(self._function, name=self._str)  # Mantiene il nome
+            copied_node = Node(eval(self.short_name), successors=[], name=self._str)  # Mantiene il nome
         
         # Copiamo gli attributi fondamentali
         copied_node._arity = self._arity

@@ -81,14 +81,11 @@ t2 = t.Tree(x, y)
 # print(t1)
 
 
-print(t2)
+#print(t2)
 print(t1)
 
-for i in range(100):
-    t1 = t.crossover(t1,t2)
-    print("t1")
-    print(t1)
-    print(t1._n)
-    print("t2")
-    print(t2)
-    print(t2._n)
+tn = copy.deepcopy(t1)
+print(tn)
+t1 = t.subtree_mutation(t1)
+print(t1)
+print(tn)

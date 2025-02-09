@@ -115,7 +115,7 @@ class Symreg:
 		
 		# if individual._h < 3:
 		# 	individual = t.expansion_mutation(individual)
-		# elif individual._h > 6:
+		# elif individual._h > 5:
 		# 	individual = t.collapse_mutation(individual)
 		# 	# mut_type = random.choice([0,1,2])
 		# 	# match mut_type:
@@ -157,25 +157,26 @@ class Symreg:
 				# MUTATION
 				p : t.Tree = self._parent_selection(population)
 				o : t.Tree = self._mutation(p)
+
 			else:
 				# RECOMBINATION
 				p1 : t.Tree = self._parent_selection(population)
 				p2 : t.Tree = self._parent_selection(population)
 				
-				o : t.Tree = t.crossover(p1, p2)
+				o : t.Tree = t.recombination(p1, p2)
 			
 			offspring.append(o)
-		
+				
 		for child in offspring:
 			child._fitness = child.fitness
-
+		
 		match self.POP_MODEL:
 			case self.POPULTAION_MODEL.STEADY_STATE, default:
 				population.extend(offspring)
 				population.sort(key=lambda i : i._fitness, reverse=False)
 			case self.POPULTAION_MODEL.GENERATIONAL:
 				population = sorted(offspring, key=lambda i : i._fitness, reverse=False)
-		
+			
 		population = population[:self.POPULATION_SIZE]
 
 		return population
@@ -197,11 +198,11 @@ class Symreg:
 	def plot_history(self) -> None:
 		plt.close('all')
 		plt.figure(figsize=(8, 6))
-		# plt.plot(
-		# 	range(len(self.history)),
-		# 	list(accumulate(self.history, max)),
-		# 	color="red"
-		# )
+		plt.plot(
+			range(len(self.history)),
+			list(accumulate(self.history, max)),
+			color="red"
+		)
 		plt.scatter(
 			range(len(self.history)),
 			self.history

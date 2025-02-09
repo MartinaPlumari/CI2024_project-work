@@ -12,8 +12,8 @@ from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply]#, np.divide]#, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
-CONSTANT_RANGE = (-1, 1) #could be an eccessive limitation
+FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
+CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 3
 VARIABLE_P = 0.5
 EARLY_STOP_P = 0.1
@@ -65,8 +65,8 @@ class Tree:
     #cumulative fitness on all the dataset
     @property
     def fitness(self) -> float:        
-        t = np.nan_to_num(self._root(**self._kwargs), nan = -1) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
-        return - np.square(self._y-t).sum()/len(self._y)# 100*np.square(self._y-t).sum()/len(self._y)
+        #t = np.nan_to_num(self._root(**self._kwargs), nan = -10) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
+        return - np.mean((self._y - self()) ** 2)#np.square(self._y-t).sum()/len(self._y)# 100*np.square(self._y-t).sum()/len(self._y)
     
     def get_node(self, n: list, node: Node = None) -> Node:
         if node is None:
@@ -151,6 +151,39 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = INIT_METHO
     
     return Node(func, successors), node_count
 
+def recombination(t1: Tree, t2: Tree) -> None:
+    if t1._n < 2 or t2._n < 2:
+        return
+    
+    # Select a random node from t1 (excluding the root)
+    n1 : Node = rnd.randint(1, t1._n - 1)  
+    node1 = t1.get_node([n1])
+    
+    # get random node from t1
+    while node1 is None or node1._parent is None:
+        n1 = rnd.randint(1, t1._n - 1)
+        node1 = t1.get_node([n1])
+    
+    n2 : Node = rnd.randint(1, t2._n-1)
+    node2 = t2.get_node([n2])
+    
+    #get random node from t2
+    while node2 is None:
+        n2 = rnd.randint(1, t2._n - 1)
+        node2 = t2.get_node([n2])
+    
+    node1._parent._successors[node1._parent._successors.index(node1)] = node2
+    node2._parent._successors[node2._parent._successors.index(node2)] = node1
+    
+    tmp : Node = node1._parent
+    node1._parent = node2._parent
+    node2._parent = tmp
+
+    t1._fitness = t1.fitness 
+    
+    return t1
+
+    
 
 def crossover(t1: Tree, t2: Tree) -> Tree:
     """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""

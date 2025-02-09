@@ -65,8 +65,8 @@ class Tree:
     #cumulative fitness on all the dataset
     @property
     def fitness(self) -> float:        
-        #t = np.nan_to_num(self._root(**self._kwargs), nan = -10) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
-        return - np.mean((self._y - self()) ** 2)#np.square(self._y-t).sum()/len(self._y)# 100*np.square(self._y-t).sum()/len(self._y)
+        t = np.nan_to_num(self._root(**self._kwargs), nan = -10) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
+        return - np.mean((t - self._y) ** 2)#np.square(self._y-t).sum()/len(self._y)# 100*np.square(self._y-t).sum()/len(self._y)
     
     def get_node(self, n: list, node: Node = None) -> Node:
         if node is None:
@@ -278,8 +278,6 @@ def permutation_mutation(t: Tree) -> Tree:
     
     node1._successors = node1._successors[::-1]
     
-    
-    
     return t
 
 def hoist_mutation(t: Tree) -> Tree:
@@ -298,7 +296,6 @@ def hoist_mutation(t: Tree) -> Tree:
     t._root = node
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    
     
     return t
 
@@ -332,7 +329,6 @@ def collapse_mutation(t: Tree) -> Tree:
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
     
-    
     return t
 
 def subtree_mutation(t: Tree) -> Tree:
@@ -355,7 +351,6 @@ def subtree_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    
     
     return t
 
@@ -381,7 +376,6 @@ def expansion_mutation(t: Tree) -> Tree:
     
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
-    
     
     return t
 

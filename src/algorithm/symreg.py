@@ -186,13 +186,15 @@ class Symreg:
 		best_solution : t.Tree = current_population[0].deep_copy()
 		for i in range(self.MAX_GENERATIONS):
 			current_population = self._step(current_population)
-			self.history.append(current_population[0]._fitness)
+			max_fitness = max(current_population, key= lambda x: x._fitness)._fitness
+			self.history.append(max_fitness)
 			if best_solution._fitness < current_population[0]._fitness:
 				best_solution = current_population[0].deep_copy()
 			
 			if i % 50 == 0:
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 		
+		self.history.append(max_fitness)
 		self.problem.solution = best_solution
 	
 	def plot_history(self) -> None:
@@ -203,8 +205,9 @@ class Symreg:
 			list(accumulate(self.history, max)),
 			color="red"
 		)
-		plt.scatter(
+		_ = plt.scatter(
 			range(len(self.history)),
-			self.history
+			self.history, 
+			marker = '.'
 		)
 		plt.show()

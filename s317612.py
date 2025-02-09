@@ -4,3 +4,6 @@
 
 import numpy as np
 
+def f5(x : np.ndarray) -> np.ndarray:
+	return np.log(np.divide(x[1], x[1]))
+

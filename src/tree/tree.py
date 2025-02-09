@@ -256,6 +256,8 @@ def permutation_mutation(t: Tree) -> Tree:
     node1 = t.get_node([n1])
     
     node1._successors = node1._successors[::-1]
+    t._h = get_tree_height(t._root)
+    t._n = count_nodes(t._root)
     
     return t
 

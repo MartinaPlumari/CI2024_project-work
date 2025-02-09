@@ -25,9 +25,9 @@ if __name__ == '__main__':
     # save the problems solution in the s310582.py file
     saver = Saver(opt.out, opt.name, opt.id)
 
-    problem : Problem = pl.problems[3]
+    problem : Problem = pl.problems[8]
 
-    alg : Symreg = Symreg(problem, 300, 300, 1000, Symreg.MUTATION.HOIST, Symreg.POPULTAION_MODEL.GENERATIONAL, 0.1, 3, False)
+    alg : Symreg = Symreg(problem, 300, 300, 1000, Symreg.MUTATION.HOIST, Symreg.POPULTAION_MODEL.STEADY_STATE, 0.1, 3, True)
     alg.train()
 
     print(f"RESULT: {alg.problem.solution._root}\nFITNESS: {alg.problem.solution._fitness}")

@@ -202,8 +202,8 @@ class Symreg:
 					steady_counter += 1
 					if steady_counter > 3:
 						self.MUTATION_PROBABILITY += 0.1
-					if steady_counter > 5:
-						break
+					# if steady_counter > 5:
+					# 	break
 				else:
 					last_fitness = best_solution._fitness
 					self.MUTATION_PROBABILITY = 0.05
@@ -223,10 +223,5 @@ class Symreg:
 			range(len(self.history)),
 			list(accumulate(self.history, max)),
 			color="red"
-		)
-		_ = plt.scatter(
-			range(len(self.history)),
-			self.history, 
-			marker = '.'
 		)
 		plt.show()

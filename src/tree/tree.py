@@ -12,8 +12,8 @@ from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply]#, np.divide]#, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
-CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
+FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide]#, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
+CONSTANT_RANGE = (-1, 1) #could be an eccessive limitation
 MAX_DEPTH = 3
 VARIABLE_P = 0.5
 EARLY_STOP_P = 0.1

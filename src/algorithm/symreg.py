@@ -115,7 +115,7 @@ class Symreg:
 		
 		if individual._h < 3:
 			individual = t.expansion_mutation(individual)
-		elif individual._h > 5:
+		elif individual._h > 6:
 			individual = t.collapse_mutation(individual)
 			# mut_type = random.choice([0,1,2])
 			# match mut_type:
@@ -166,7 +166,12 @@ class Symreg:
 				p1 : t.Tree = self._parent_selection(population)
 				p2 : t.Tree = self._parent_selection(population)
 				
-				o : t.Tree = t.crossover(p1, p2)
+				if p1._h > 10 or p2._h > 10:
+					o : t.Tree = self._mutation(p1)
+				else:
+					o : t.Tree = t.crossover(p1, p2)
+
+
 			
 			offspring.append(o)
 
@@ -183,12 +188,12 @@ class Symreg:
 	
 	def train(self) -> None:
 		current_solution : list[t.Tree] = self.population.copy()
-		best_solution : t.Tree = current_solution[0]
+		best_solution : t.Tree = current_solution[0].deep_copy()
 		for i in range(self.MAX_GENERATIONS):
 			current_solution = self._step(current_solution)
 			self.history.append(current_solution[0]._fitness)
 			if best_solution._fitness < current_solution[0]._fitness:
-				best_solution = current_solution[0]
+				best_solution = current_solution[0].deep_copy()
 			
 			if i % 50 == 0:
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
@@ -198,8 +203,13 @@ class Symreg:
 	def plot_history(self) -> None:
 		plt.close('all')
 		plt.figure(figsize=(8, 6))
-		plt.scatter(
+		plt.plot(
 			range(len(self.history)),
-			self.history
+			list(accumulate(self.history, max)),
+			color="red"
 		)
+		# plt.scatter(
+		# 	range(len(self.history)),
+		# 	self.history
+		# )
 		plt.show()

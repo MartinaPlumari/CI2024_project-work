@@ -82,7 +82,14 @@ class Node:
             assert False
     
     def __call__(self, **kwargs):
-        return self._function(*[c(**kwargs) for c in self._successors], **kwargs)
+        res = self._function(*[c(**kwargs) for c in self._successors], **kwargs)
+        
+        if self._parent is not None and (self._parent.short_name == 'np.divide' or self._parent.short_name == 'np.log'):
+            res[res == 0] = 0.001
+        elif self._parent is not None and (self._parent.short_name == 'np.log' and self._parent.short_name == 'np.sqrt'):
+            res[res < 0] = abs(res)
+        return res
+        
         
     def __str__(self):
         return self.long_name

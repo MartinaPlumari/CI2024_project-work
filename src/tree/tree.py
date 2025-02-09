@@ -136,18 +136,18 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = INIT_METHO
         successors.append(child)
         node_count += child_count  # Accumulate total nodes created
     
-        # Handle edge cases
-    if func == np.log:  # Ensure log input is positive
-        successors = [Node(np.absolute, successors)]
-        node_count += 1  # Add new absolute node
+    #     # Handle edge cases
+    # if func == np.log:  # Ensure log input is positive
+    #     successors = [Node(np.absolute, successors)]
+    #     node_count += 1  # Add new absolute node
                    
-    elif func == np.divide:  # Ensure denominator is not zero
-        if successors[1]._leaf and successors[1]._type == 'c' and -0.001 < successors[1]() < 0.001:
-            successors[1] = Node(1)  # Replace zero denominator
+    # elif func == np.divide:  # Ensure denominator is not zero
+    #     if successors[1]._leaf and successors[1]._type == 'c' and -0.001 < successors[1]() < 0.001:
+    #         successors[1] = Node(1)  # Replace zero denominator
 
-    elif func == np.sqrt:  # Ensure sqrt input is positive
-        successors = [Node(np.absolute, successors)]
-        node_count += 1  # Add new absolute node
+    # elif func == np.sqrt:  # Ensure sqrt input is positive
+    #     successors = [Node(np.absolute, successors)]
+    #     node_count += 1  # Add new absolute node
     
     return Node(func, successors), node_count
 
@@ -209,16 +209,16 @@ def point_mutation(t: Tree) -> Tree:
     #this has debug purposes: to be deleted
     #print(f"Replacing function {node._str} with {func.__name__}")
     
-    if func == np.log and node._successors[0].short_name != 'np.absolute':
-         node._successors = [Node(np.absolute, node._successors)]
-    elif func == np.divide:
-        if node._successors[1]._leaf and node._successors[1]._type == 'c' and -0.001 < node._successors[1]() < 0.001:
-            node._successors[1] = Node(1)
-    elif func == np.sqrt:
-        if node._successors[0]._leaf and node._successors[0]._type == 'c' and -0.001 < node._successors[0]() < 0.001:
-            node._successors[0] = Node(0.1)
-        if node._successors[0].short_name != 'np.absolute':
-            node._successors = [Node(np.absolute, node._successors)]
+    # if func == np.log and node._successors[0].short_name != 'np.absolute':
+    #      node._successors = [Node(np.absolute, node._successors)]
+    # elif func == np.divide:
+    #     if node._successors[1]._leaf and node._successors[1]._type == 'c' and -0.001 < node._successors[1]() < 0.001:
+    #         node._successors[1] = Node(1)
+    # elif func == np.sqrt:
+    #     if node._successors[0]._leaf and node._successors[0]._type == 'c' and -0.001 < node._successors[0]() < 0.001:
+    #         node._successors[0] = Node(0.1)
+    #     if node._successors[0].short_name != 'np.absolute':
+    #         node._successors = [Node(np.absolute, node._successors)]
     
     new_node = Node(func, node._successors)
     parent = node._parent

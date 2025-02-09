@@ -24,9 +24,9 @@ tree1 = t.create_random_tree(var)
     
 #while str(tree2) == 'nan':   
 tree2 = t.create_random_tree(var)
-
 t1 = t.Tree(x, y)
 t2 = t.Tree(x, y)
+print(str(t1))
 #print("Albero da cui partire:")
 #print(t1)
 #print(t.get_tree_height(t1._root))
@@ -84,8 +84,16 @@ t2 = t.Tree(x, y)
 #print(t2)
 print(t1)
 
-tn = copy.deepcopy(t1)
-print(tn)
-t1 = t.subtree_mutation(t1)
-print(t1)
-print(tn)
+# tn = t1.deep_copy()
+# print(tn)
+# t1 = t.subtree_mutation(t1)
+# print(t1)
+# print(tn)
+# print(tn._n)
+# print(t1._fitness)
+print(t1())
+
+# for i in range(10):
+#     blallo = t.crossover(t1, tn)
+#     print(blallo)
+#     print(blallo._n)

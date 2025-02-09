@@ -180,7 +180,7 @@ class Symreg:
 	
 	def train(self) -> None:
 		current_population : list[t.Tree] = self.population
-		best_solution : t.Tree = current_population[0].deep_copy()
+		best_solution : t.Tree = current_population[0]
 		
 		last_fitness : float = 0
 		steady_counter : int = 0
@@ -207,8 +207,6 @@ class Symreg:
 				else:
 					last_fitness = best_solution._fitness
 					self.MUTATION_PROBABILITY = 0.05
-					# if self.MUTATION_PROBABILITY < 0.05:
-					# 	self.MUTATION_PROBABILITY = 0.05
 					steady_counter = 0
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 

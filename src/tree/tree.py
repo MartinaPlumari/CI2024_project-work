@@ -138,7 +138,7 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = INIT_METHO
     
     return Node(func, successors), node_count
 
-def recombination(t1: Tree, t2: Tree) -> None:
+def recombination(t1: Tree, t2: Tree) -> Tree:
     if t1._n < 2 or t2._n < 2:
         return
     
@@ -167,7 +167,12 @@ def recombination(t1: Tree, t2: Tree) -> None:
     node2._parent = tmp
 
     t1._fitness = t1.fitness 
-    
+    t2._fitness = t2.fitness
+    t1._h = get_tree_height(t1._root)
+    t1._n = count_nodes(t1._root)
+    t2._h = get_tree_height(t2._root)
+    t2._n = count_nodes(t2._root)
+
     return t1
 
     

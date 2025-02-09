@@ -112,36 +112,33 @@ class Symreg:
 		if self.USE_RAND_MUT_TYPE:
 			# select random mutation type
 			mut_type = random.choice(list(self.MUTATION))
-		
-		# if individual._h < 3:
-		# 	individual = t.expansion_mutation(individual)
-		# elif individual._h > 5:
-		# 	individual = t.collapse_mutation(individual)
-		# 	# mut_type = random.choice([0,1,2])
-		# 	# match mut_type:
-		# 	# 	case 0:
-		# 	# 		individual = t.collapse_mutation(individual)
-		# 	# 	case 1:
-		# 	# 		individual = t.subtree_mutation(individual)
-		# 	# 	case 2:
-		# 	# 		individual = t.hoist_mutation(individual)
-		# else:
-		# 	individual = t.point_mutation(individual)
 
 		# select mutation type
 		match mut_type:
 			case self.MUTATION.SUBTREE:
-				individual = t.subtree_mutation(individual)
+				if individual._h > 3: 
+					individual = t.subtree_mutation(individual)
+				else:
+					individual = t.expansion_mutation(individual)
 			case self.MUTATION.POINT:
 				individual = t.point_mutation(individual)
 			case self.MUTATION.PERMUT:
 				individual = t.permutation_mutation(individual)
 			case self.MUTATION.HOIST:
-				individual = t.hoist_mutation(individual)
+				if individual._h <= 4: 
+					individual = t.hoist_mutation(individual)
+				else:
+					individual = t.collapse_mutation(individual)
 			case self.MUTATION.COLLAPSE:
-				individual = t.collapse_mutation(individual)
+				if individual._h > 3: 
+					individual = t.collapse_mutation(individual)
+				else:
+					individual = t.expansion_mutation(individual)
 			case self.MUTATION.EXPANSION:
-				individual = t.expansion_mutation(individual)
+				if individual._h <= 4: 
+					individual = t.expansion_mutation(individual)
+				else:
+					individual = t.collapse_mutation(individual)
 
 		return individual
 
@@ -184,25 +181,41 @@ class Symreg:
 	def train(self) -> None:
 		current_population : list[t.Tree] = self.population
 		best_solution : t.Tree = current_population[0].deep_copy()
+		
+		last_fitness : float = 0
+		steady_counter : int = 0
 
-		steady_counter = 0	
-  
+		self.history.append(max(current_population, key= lambda x: x._fitness)._fitness)
+
 		for i in range(self.MAX_GENERATIONS):
 			current_population = self._step(current_population)
-			max_fitness = max(current_population, key= lambda x: x._fitness)._fitness
-			self.history.append(max_fitness)
-			if best_solution._fitness < current_population[0]._fitness:
-				best_solution = current_population[0].deep_copy()
-			elif best_solution._fitness == current_population[0]._fitness:
-				steady_counter += 1
+			
+			current_solution = max(current_population, key= lambda x: x._fitness)
+			
+			self.history.append(current_solution._fitness)
+			
+			if best_solution._fitness < current_solution._fitness:
+				best_solution = current_solution.deep_copy()
 			
 			if i % 50 == 0:
+				if best_solution._fitness == last_fitness:
+					steady_counter += 1
+					if steady_counter > 3:
+						self.MUTATION_PROBABILITY += 0.1
+					if steady_counter > 5:
+						break
+				else:
+					last_fitness = best_solution._fitness
+					self.MUTATION_PROBABILITY = 0.05
+					# if self.MUTATION_PROBABILITY < 0.05:
+					# 	self.MUTATION_PROBABILITY = 0.05
+					steady_counter = 0
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 
 			if steady_counter > 50:
 				self.MUTATION_PROBABILITY += 0.05
 		
-		self.history.append(max_fitness)
+		self.history.append(best_solution._fitness)
 		self.problem.solution = best_solution
 	
 	def plot_history(self) -> None:

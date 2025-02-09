@@ -117,17 +117,19 @@ class Node:
         # Creiamo un nuovo nodo in base al tipo
         if self._type == 'c':  # Costante
             copied_node = Node(float(self._str))
+            return copied_node
         elif self._type == 'v':  # Variabile
             copied_node = Node(self._str)
+            return copied_node
         else:  # Funzione
             copied_node = Node(eval(self.short_name), successors=[], name=self._str)  # Mantiene il nome
         
         # Copiamo gli attributi fondamentali
-        copied_node._arity = self._arity
-        copied_node._type = self._type
-        copied_node._leaf = self._leaf
-        copied_node._str = self._str
-        copied_node._parent = None  # La parent verrà aggiornata in seguito
+        # copied_node._arity = self._arity
+        # copied_node._type = self._type
+        # copied_node._leaf = self._leaf
+        # copied_node._str = self._str
+        # copied_node._parent = None  # La parent verrà aggiornata in seguito
         
         # Copia ricorsiva dei successori
         copied_node._successors = [copy.deepcopy(s, memo) for s in self._successors]

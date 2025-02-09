@@ -86,7 +86,7 @@ class Tree:
     
     def deep_copy(self) -> 'Tree':
         new_tree = Tree(self._x, self._y)
-        new_tree._root = self._root.copy()
+        new_tree._root = copy.deepcopy(self._root)
         new_tree._n = self._n
         new_tree._h = self._h
         new_tree._fitness = self._fitness

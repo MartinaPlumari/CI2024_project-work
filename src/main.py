@@ -34,4 +34,4 @@ if __name__ == '__main__':
     saver.append_solution(alg.problem)
 
     alg.plot_history()
-    draw.draw_tree(alg.problem.solution._root)
+    draw.draw_tree(alg.problem.solution._root)  

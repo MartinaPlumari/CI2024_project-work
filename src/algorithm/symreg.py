@@ -33,8 +33,8 @@ class Symreg:
 		POINT = 1
 		PERMUT = 2
 		HOIST = 3
+		EXPANSION = 4
 		COLLAPSE = 5
-		# EXPANSION = 4
 	
 	class POPULTAION_MODEL(Enum):
 		STEADY_STATE = 0,
@@ -184,15 +184,23 @@ class Symreg:
 	def train(self) -> None:
 		current_population : list[t.Tree] = self.population
 		best_solution : t.Tree = current_population[0].deep_copy()
+
+		steady_counter = 0	
+  
 		for i in range(self.MAX_GENERATIONS):
 			current_population = self._step(current_population)
 			max_fitness = max(current_population, key= lambda x: x._fitness)._fitness
 			self.history.append(max_fitness)
 			if best_solution._fitness < current_population[0]._fitness:
 				best_solution = current_population[0].deep_copy()
+			elif best_solution._fitness == current_population[0]._fitness:
+				steady_counter += 1
 			
 			if i % 50 == 0:
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
+
+			if steady_counter > 50:
+				self.MUTATION_PROBABILITY += 0.05
 		
 		self.history.append(max_fitness)
 		self.problem.solution = best_solution

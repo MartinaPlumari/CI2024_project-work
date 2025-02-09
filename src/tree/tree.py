@@ -15,7 +15,7 @@ import copy
 FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 3
-VARIABLE_P = 0.5
+VARIABLE_P = 0.7
 EARLY_STOP_P = 0.1
 
 class INIT_METHOD(Enum):
@@ -136,19 +136,6 @@ def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode = INIT_METHO
         successors.append(child)
         node_count += child_count  # Accumulate total nodes created
     
-    #     # Handle edge cases
-    # if func == np.log:  # Ensure log input is positive
-    #     successors = [Node(np.absolute, successors)]
-    #     node_count += 1  # Add new absolute node
-                   
-    # elif func == np.divide:  # Ensure denominator is not zero
-    #     if successors[1]._leaf and successors[1]._type == 'c' and -0.001 < successors[1]() < 0.001:
-    #         successors[1] = Node(1)  # Replace zero denominator
-
-    # elif func == np.sqrt:  # Ensure sqrt input is positive
-    #     successors = [Node(np.absolute, successors)]
-    #     node_count += 1  # Add new absolute node
-    
     return Node(func, successors), node_count
 
 def recombination(t1: Tree, t2: Tree) -> None:
@@ -268,9 +255,12 @@ def point_mutation(t: Tree) -> Tree:
 def permutation_mutation(t: Tree) -> Tree:
     """Exchanges two lives in the tree"""
     
-    valid_nodes = [i for i in range(t._n) if not t.get_node([i]).is_leaf and t.get_node([i])._arity > 1]
+    if t._n < 3:
+        return t
     
-    if not valid_nodes:
+    valid_nodes = [i for i in range(t._n-1) if  t.get_node([i]) is not None and not t.get_node([i]).is_leaf and t.get_node([i])._arity > 1]
+    
+    if len(valid_nodes) == 0:
         return t
     
     n1 = rnd.choice(valid_nodes)

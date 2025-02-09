@@ -14,7 +14,7 @@ import copy
 
 FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
-MAX_DEPTH = 3
+MAX_DEPTH = 4
 VARIABLE_P = 0.7
 EARLY_STOP_P = 0.1
 
@@ -231,20 +231,6 @@ def point_mutation(t: Tree) -> Tree:
     old_arity = node._arity
     func = rnd.choice([f for f in FUNCTIONS if (("np." + f.__name__) != node.short_name and arity(f) == old_arity)])           
     
-    #this has debug purposes: to be deleted
-    #print(f"Replacing function {node._str} with {func.__name__}")
-    
-    # if func == np.log and node._successors[0].short_name != 'np.absolute':
-    #      node._successors = [Node(np.absolute, node._successors)]
-    # elif func == np.divide:
-    #     if node._successors[1]._leaf and node._successors[1]._type == 'c' and -0.001 < node._successors[1]() < 0.001:
-    #         node._successors[1] = Node(1)
-    # elif func == np.sqrt:
-    #     if node._successors[0]._leaf and node._successors[0]._type == 'c' and -0.001 < node._successors[0]() < 0.001:
-    #         node._successors[0] = Node(0.1)
-    #     if node._successors[0].short_name != 'np.absolute':
-    #         node._successors = [Node(np.absolute, node._successors)]
-    
     new_node = Node(func, node._successors)
     parent = node._parent
     if(parent is None):
@@ -252,8 +238,6 @@ def point_mutation(t: Tree) -> Tree:
     else:
         new_node._parent = parent
         node._parent._successors[parent._successors.index(node)] = new_node  
-
-    
     
     return t
 
@@ -289,6 +273,7 @@ def hoist_mutation(t: Tree) -> Tree:
         node = t.get_node([n])
     
     t._root = node
+    t._root._parent = None
     t._h = get_tree_height(t._root)
     t._n = count_nodes(t._root)
     

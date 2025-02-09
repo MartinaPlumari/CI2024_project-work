@@ -210,7 +210,7 @@ class Symreg:
 					steady_counter = 0
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 
-			if steady_counter > 50:
+			if steady_counter > 150:
 				self.MUTATION_PROBABILITY += 0.05
 		
 		self.history.append(best_solution._fitness)

@@ -122,10 +122,12 @@ class Symreg:
 		mut_type = self.MUTATION_TYPE
 
 		# guard from bloat
-		if individual._h < 3:
+		if individual._h < 2:
 			individual = t.expansion_mutation(individual)
-		elif individual._h >=8:
+			return individual
+		elif individual._h >=4:
 			individual = t.hoist_mutation(individual)
+			return individual
 
 		if self.USE_RAND_MUT_TYPE:
 			# select random mutation type
@@ -158,13 +160,13 @@ class Symreg:
 		for _ in range(self.OFFSPRING_SIZE):
 			if np.random.random() <= self.MUTATION_PROBABILITY:
 				# MUTATION
-				p : t.Tree = self._parent_selection(population)#.deep_copy()
+				p : t.Tree = self._parent_selection(population)
 				o : t.Tree = self._mutation(p)
 
 			else:
 				# RECOMBINATION
-				p1 : t.Tree = self._parent_selection(population)#.deep_copy()
-				p2 : t.Tree = self._parent_selection(population)#.deep_copy()
+				p1 : t.Tree = self._parent_selection(population)
+				p2 : t.Tree = self._parent_selection(population)
 				
 				o : t.Tree = t.recombination(p1, p2)
 			

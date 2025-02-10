@@ -25,23 +25,23 @@ if __name__ == '__main__':
     # save the problems solution in the s310582.py file
     saver = Saver(opt.out, opt.name, opt.id)
 
-    problem : Problem = pl.problems[6]
+    problems : list[Problem] = [pl.problems[i] for i in range(len(pl.problems)) if opt.all or i == opt.index]
+    print([p.problem_id for p in problems])
+    for i in range(len(problems)):
+        print(f"\nStarting problem {problems[i].problem_id}")
+        alg : Symreg = Symreg(problem=problems[i], 
+                            population_size=opt.popsize, 
+                            offspring_size=opt.offsize, 
+                            max_generations=opt.maxgen, 
+                            mutation_type=opt.mtype, 
+                            population_model=opt.pmodel,
+                            mutation_probability=opt.mutchance,
+                            tournament_size=opt.tsize,
+                            use_random_mutation_type=opt.random,
+                            population_init_method=opt.pinitmodel)
+        alg.train()
+        print(f"\nRESULT: {alg.problem.solution._root}\nFITNESS: {alg.problem.solution._fitness}\n================================\n")
+        saver.append_solution(alg.problem)
 
-    alg : Symreg = Symreg(problem=problem, 
-                        population_size=5000, 
-                        offspring_size=5000, 
-                        max_generations=1000, 
-                        mutation_type=Symreg.MUTATION.EXPANSION, 
-                        population_model=Symreg.POPULATION_MODEL.STEADY_STATE,
-                        mutation_probability=0.05,
-                        tournament_size=3,
-                        use_random_mutation_type=True,
-                        population_init_method=Symreg.INIT_METHOD.HALF_HALF)
-    alg.train()
-
-    print(f"RESULT: {alg.problem.solution._root}\nFITNESS: {alg.problem.solution._fitness}")
-
-    saver.append_solution(alg.problem)
-
-    alg.plot_history()
-    draw.draw_tree(alg.problem.solution._root)
+    # alg.plot_history()
+    # draw.draw_tree(alg.problem.solution._root)

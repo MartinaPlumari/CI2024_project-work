@@ -87,8 +87,12 @@ class Symreg:
 		self.problem = problem
 		self.use_validation = problem.use_validation_set
 		self.mutation_type = mutation_type
-		x = problem.x_train
-		y = problem.y_train
+
+		self.init_population()
+	
+	def init_population(self) -> None:
+		x = self.problem.x_train
+		y = self.problem.y_train
 
 		# init population
 		if self.POP_INIT_METHOD == self.INIT_METHOD.HALF_HALF:
@@ -212,7 +216,7 @@ class Symreg:
 						self.MUTATION_PROBABILITY += 0.05
 						if self.MUTATION_PROBABILITY > 1:
 							self.MUTATION_PROBABILITY = 1
-					if steady_counter > 10:
+					if steady_counter > 6:
 						break
 				else:
 					# reset

@@ -13,7 +13,7 @@ from utils.arity import arity
 import copy
 
 FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
-CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
+CONSTANT_RANGE = (-1, 1) #could be an eccessive limitation
 MAX_DEPTH = 4
 VARIABLE_P = 0.7
 EARLY_STOP_P = 0.0
@@ -61,7 +61,7 @@ class Tree:
     #cumulative fitness on all the dataset
     @property
     def fitness(self) -> float:        
-        t = np.nan_to_num(self._root(**self._kwargs), nan = -10) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
+        t = np.nan_to_num(self._root(**self._kwargs), nan = -1) #per ora i nan vengono sostituiti con un valore negativo (fitness peggiore)
         return - np.mean((t - self._y) ** 2)#np.square(self._y-t).sum()/len(self._y)# 100*np.square(self._y-t).sum()/len(self._y)
     
     def get_node(self, n: list, node: Node = None) -> Node:

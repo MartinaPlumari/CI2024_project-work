@@ -25,9 +25,18 @@ if __name__ == '__main__':
     # save the problems solution in the s310582.py file
     saver = Saver(opt.out, opt.name, opt.id)
 
-    problem : Problem = pl.problems[8]
+    problem : Problem = pl.problems[0]
 
-    alg : Symreg = Symreg(problem, 300, 300, 1000, Symreg.MUTATION.HOIST, Symreg.POPULTAION_MODEL.STEADY_STATE, 0.1, 3, True)
+    alg : Symreg = Symreg(problem=problem, 
+                        population_size=300, 
+                        offspring_size=300, 
+                        max_generations=1000, 
+                        mutation_type=Symreg.MUTATION.EXPANSION, 
+                        population_model=Symreg.POPULATION_MODEL.GENERATIONAL, 
+                        mutation_probability=0.05,
+                        tournament_size=3,
+                        use_random_mutation_type=True,
+                        population_init_method=Symreg.INIT_METHOD.HALF_HALF)
     alg.train()
 
     print(f"RESULT: {alg.problem.solution._root}\nFITNESS: {alg.problem.solution._fitness}")

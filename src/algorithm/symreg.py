@@ -93,8 +93,8 @@ class Symreg:
 		# init population
 		if self.POP_INIT_METHOD == self.INIT_METHOD.HALF_HALF:
 			for _ in range(self.POPULATION_SIZE//2):
-				self.population.append(t.Tree(x, y, INIT_METHOD=t.INIT_METHOD.FULL))
-				self.population.append(t.Tree(x, y, INIT_METHOD=t.INIT_METHOD.GROW))
+				self.population.append(t.Tree(x, y, INIT_METHOD=self.INIT_METHOD.FULL))
+				self.population.append(t.Tree(x, y, INIT_METHOD=self.INIT_METHOD.GROW))
 		else:
 			for _ in range(self.POPULATION_SIZE):
 				self.population.append(t.Tree(x, y, INIT_METHOD=self.POP_INIT_METHOD))
@@ -128,7 +128,7 @@ class Symreg:
 		# select mutation type
 		match mut_type:
 			case self.MUTATION.SUBTREE:
-				if individual._h > 3: 
+				if individual._h >= 2: 
 					individual = t.subtree_mutation(individual)
 				else:
 					individual = t.expansion_mutation(individual)
@@ -137,17 +137,17 @@ class Symreg:
 			case self.MUTATION.PERMUT:
 				individual = t.permutation_mutation(individual)
 			case self.MUTATION.HOIST:
-				if individual._h <= 4: 
+				if individual._h <= 5: 
 					individual = t.hoist_mutation(individual)
 				else:
 					individual = t.collapse_mutation(individual)
 			case self.MUTATION.COLLAPSE:
-				if individual._h > 3: 
+				if individual._h >= 2: 
 					individual = t.collapse_mutation(individual)
 				else:
 					individual = t.expansion_mutation(individual)
 			case self.MUTATION.EXPANSION:
-				if individual._h <= 4: 
+				if individual._h <= 5: 
 					individual = t.expansion_mutation(individual)
 				else:
 					individual = t.collapse_mutation(individual)
@@ -164,13 +164,13 @@ class Symreg:
 		for _ in range(self.OFFSPRING_SIZE):
 			if np.random.random() <= self.MUTATION_PROBABILITY:
 				# MUTATION
-				p : t.Tree = self._parent_selection(population)
+				p : t.Tree = self._parent_selection(population)#.deep_copy()
 				o : t.Tree = self._mutation(p)
 
 			else:
 				# RECOMBINATION
-				p1 : t.Tree = self._parent_selection(population)
-				p2 : t.Tree = self._parent_selection(population)
+				p1 : t.Tree = self._parent_selection(population)#.deep_copy()
+				p2 : t.Tree = self._parent_selection(population)#.deep_copy()
 				
 				o : t.Tree = t.recombination(p1, p2)
 			
@@ -213,17 +213,18 @@ class Symreg:
 				if best_solution._fitness == last_fitness:
 					steady_counter += 1
 					if steady_counter > 3:
-						self.MUTATION_PROBABILITY += 0.1
-					# if steady_counter > 5:
-					# 	break
+						self.MUTATION_PROBABILITY += 0.05
+						if self.MUTATION_PROBABILITY > 1:
+							self.MUTATION_PROBABILITY = 1
+					if steady_counter > 10:
+						break
 				else:
 					last_fitness = best_solution._fitness
-					self.MUTATION_PROBABILITY = 0.05
+					self.MUTATION_PROBABILITY -= 0.15
+					if self.MUTATION_PROBABILITY < 0.05:
+						self.MUTATION_PROBABILITY = 0.05
 					steady_counter = 0
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
-
-			if steady_counter > 150:
-				self.MUTATION_PROBABILITY += 0.05
 		
 		self.history.append(best_solution._fitness)
 		self.problem.solution = best_solution

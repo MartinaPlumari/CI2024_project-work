@@ -121,6 +121,12 @@ class Symreg:
 
 		mut_type = self.MUTATION_TYPE
 
+		# guard from bloat
+		if individual._h < 3:
+			individual = t.expansion_mutation(individual)
+		elif individual._h >=8:
+			individual = t.hoist_mutation(individual)
+
 		if self.USE_RAND_MUT_TYPE:
 			# select random mutation type
 			mut_type = random.choice(list(self.MUTATION))
@@ -128,29 +134,17 @@ class Symreg:
 		# select mutation type
 		match mut_type:
 			case self.MUTATION.SUBTREE:
-				if individual._h >= 2: 
-					individual = t.subtree_mutation(individual)
-				else:
-					individual = t.expansion_mutation(individual)
+				individual = t.subtree_mutation(individual)
 			case self.MUTATION.POINT:
 				individual = t.point_mutation(individual)
 			case self.MUTATION.PERMUT:
 				individual = t.permutation_mutation(individual)
 			case self.MUTATION.HOIST:
-				if individual._h <= 5: 
-					individual = t.hoist_mutation(individual)
-				else:
-					individual = t.collapse_mutation(individual)
+				individual = t.hoist_mutation(individual)
 			case self.MUTATION.COLLAPSE:
-				if individual._h >= 2: 
-					individual = t.collapse_mutation(individual)
-				else:
-					individual = t.expansion_mutation(individual)
+				individual = t.collapse_mutation(individual)
 			case self.MUTATION.EXPANSION:
-				if individual._h <= 5: 
-					individual = t.expansion_mutation(individual)
-				else:
-					individual = t.collapse_mutation(individual)
+				individual = t.expansion_mutation(individual)
 
 		return individual
 
@@ -219,10 +213,9 @@ class Symreg:
 					if steady_counter > 10:
 						break
 				else:
+					# reset
 					last_fitness = best_solution._fitness
-					self.MUTATION_PROBABILITY -= 0.15
-					if self.MUTATION_PROBABILITY < 0.05:
-						self.MUTATION_PROBABILITY = 0.05
+					self.MUTATION_PROBABILITY = 0.05
 					steady_counter = 0
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 		

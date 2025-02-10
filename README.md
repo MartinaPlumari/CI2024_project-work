@@ -148,3 +148,5 @@ parlare del fatto che non abbiamo provato altre strategie oltre hyper modern
 
 ## Credits
 
+* The ```Node``` class was based on the implementation by [Prof. Giovanni Squillero](https://github.com/squillero/computational-intelligence/tree/master/2024-25/symreg/gxgp) and only slightly modified and extended to fit our needs.
+* The [gplearn](https://gplearn.readthedocs.io/en/stable/intro.html) documentation was a very useful resource for understanding the genetic programming concepts and the implementation of the algorithm.

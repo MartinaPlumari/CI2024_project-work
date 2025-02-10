@@ -41,7 +41,7 @@ def parse_cmd_arguments():
     parser.add_argument('--maxgen', type=int, default=100, help='Max train generations.')
     parser.add_argument('--mtype', type=int, default=0, help="""Type of applied mutation:\n\t- SUBTREE = 0\n\t- POINT = 1\n\t- PERMUT = 2\n\t- HOIST = 3\n\t- EXPANSION = 4\n\t- COLLAPSE = 5""")
     parser.add_argument('--pmodel', type=int, default=0, help="""Population model:\n\t-STEADY_STATE = 0\n\t-GENERATIONAL = 1""")
-    parser.add_argument('--pinitmodel', type=int, default=0, help="""Population initialization model:\n\t-GROW = 0 // trees have chance of being shorter than max depth\n\t-FULL = 1 // All trees reach max depth\n\t-HALF_HALF = 2 // half of population is GROW and other half is FULL""")
+    parser.add_argument('--pinitmodel', type=int, default=1, help="""Population initialization model:\n\t-GROW = 0 // trees have chance of being shorter than max depth\n\t-FULL = 1 // All trees reach max depth\n\t-HALF_HALF = 2 // half of population is GROW and other half is FULL""")
     parser.add_argument('--mutchance', type=float, default=0.05, help='Initial probability to mutate an individual instead of performing recombination.')
     parser.add_argument('--tsize', type=int, default=3, help='Max number of individuals for tournament style parent selection.')
     parser.add_argument('--random', action='store_true', help='If enabled, during training select a random mutation instead of using mtype.')

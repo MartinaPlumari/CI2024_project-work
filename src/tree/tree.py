@@ -141,7 +141,7 @@ def recombination(t1: Tree, t2: Tree) -> Tree:
         n1 = rnd.randint(1, t1._n - 1)
         node1 = t1.get_node([n1])
     
-    #get random node from t2
+    # Select a random node from t2 (excluding the root)
     n2 : Node = rnd.randint(1, t2._n-1)
     node2 = t2.get_node([n2])
     
@@ -149,13 +149,16 @@ def recombination(t1: Tree, t2: Tree) -> Tree:
         n2 = rnd.randint(1, t2._n - 1)
         node2 = t2.get_node([n2])
     
+    # for both nodes' children invert the parent
     node1._parent._successors[node1._parent._successors.index(node1)] = node2
     node2._parent._successors[node2._parent._successors.index(node2)] = node1
     
+    # invert the parent for the selected nodes
     tmp : Node = node1._parent
     node1._parent = node2._parent
     node2._parent = tmp
 
+    # re-compute parameters
     t1._fitness = t1.fitness 
     t2._fitness = t2.fitness
     t1._h = get_tree_height(t1._root)

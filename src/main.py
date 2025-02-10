@@ -20,15 +20,17 @@ if __name__ == '__main__':
         
     # load all the problems from path
     pl = ProblemList()
-    pl.load_from_path(opt.dset, opt.count, opt.split, opt.ratio)
+    pl.load_from_path(opt.dset, opt.count)
 
-    # save the problems solution in the s310582.py file
+    # creates a s310582.py template file to then append solutions
     saver = Saver(opt.out, opt.name, opt.id)
 
+    # select chosen problems
     problems : list[Problem] = [pl.problems[i] for i in range(len(pl.problems)) if opt.all or i == opt.index]
-    print(problems)
+    
+    # run algorithm for each problem
     for i in range(len(problems)):
-        print(f"\nStarting problem {problems[i].problem_id}")
+        print(f"\n=============== STARTING PROBLEM: {problems[i].problem_id} ===============")
         alg : Symreg = Symreg(problem=problems[i], 
                             population_size=opt.popsize, 
                             offspring_size=opt.offsize, 
@@ -41,4 +43,6 @@ if __name__ == '__main__':
                             population_init_method=opt.pinitmodel)
         alg.train()
         print(f"\nRESULT: {alg.problem.solution._root}\nFITNESS: {alg.problem.solution._fitness}\n================================\n")
+        
+        # append the solution in the s123456.py file
         saver.append_solution(alg.problem)

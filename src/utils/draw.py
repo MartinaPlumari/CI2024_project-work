@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from tree.node import Node
 
 def hierarchy_pos(G, root, width=1.0, vert_gap=0.2, xcenter=0.5, pos=None, level=0):
-	"""Funzione per posizionare i nodi in modo gerarchico (top-down)."""
+	"""Foreach node compute a 2D position starting from the root"""
 	if pos is None:
 		pos = {root: (xcenter, 1 - level * vert_gap)}
 	else:
@@ -18,7 +18,7 @@ def hierarchy_pos(G, root, width=1.0, vert_gap=0.2, xcenter=0.5, pos=None, level
 
 	children = list(G.successors(root))
 	if len(children) != 0:
-		dx = width / max(1, len(children))  # Spazio tra i figli
+		dx = width / max(1, len(children))
 		nextx = xcenter - width / 2 - dx / 2
 		for child in children:
 			nextx += dx
@@ -26,14 +26,8 @@ def hierarchy_pos(G, root, width=1.0, vert_gap=0.2, xcenter=0.5, pos=None, level
 
 	return pos
 
-# # Definizione dell'albero (padre -> figli)
-# edges = [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6), (3, 7)]
-
-# # Etichette dei nodi
-# labels = {1: "Root", 2: "A", 3: "B", 4: "C", 5: "D", 6: "E", 7: "F"}
-
 def compute_edges(node : Node, counter=[1], node_id_map={}, edges=[], labels={}, parent_id=None) -> tuple[list, object]:
-	# Assegna un ID univoco al nodo
+	"""For each node recursively compute each graph edges and labels."""
 	node_id = counter[0]
 	node_id_map[node] = node_id
 	counter[0] += 1
@@ -49,17 +43,18 @@ def compute_edges(node : Node, counter=[1], node_id_map={}, edges=[], labels={},
 
 
 def draw_tree(root : Node) -> None:
+	# compute graph's edges
 	(edges, labels) = compute_edges(root, parent_id=0)
 	edges.pop(0)
 	
-	# Creazione del grafo
+	# Graph creation
 	G = nx.DiGraph()
 	G.add_edges_from(edges)
 
-	# Calcolo della posizione dei nodi
+	# Compute the 2D positions of each nodes to draw the graph as a tree
 	pos = hierarchy_pos(G, root=1)
 
-	# Disegno dell'albero
+	# Plot the tree
 	plt.close('all') 
 	plt.figure(figsize=(8, 6))
 	nx.draw(G, pos, with_labels=False, node_color="lightblue", edge_color="black", node_size=1200, arrows=False)

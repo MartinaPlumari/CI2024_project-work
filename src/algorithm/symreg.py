@@ -10,21 +10,17 @@ from utils.problemloader import Problem
 from enum import Enum
 import random
 import numpy as np
-import utils.draw as draw
 import matplotlib.pyplot as plt
 from itertools import accumulate
 
 
 class Symreg:
-	# data loading / initialization
-	# counter 
-	# cost (using the fitness function inside tree)
+	"""
+	Class that handle training for a symbolic regression problem.
+	"""
 
 	problem : Problem
 	history : list[float]
-
-	# definire una classe quindi un tipo
-
 	population : list[t.Tree] = list()
 	use_validation : bool
 
@@ -54,9 +50,6 @@ class Symreg:
 	MUTATION_PROBABILITY : float
 	TOURNAMENT_SIZE : int
 	USE_RAND_MUT_TYPE : bool
-	
-	# fare in modo che in init vengano passati gli argmenti da linea di comando per decidere i vari iper parametri 
-	# e le strategie come ad esempio quale tipo di mutazione usare.
 
 	def __init__(self, 
 			  problem : Problem, 
@@ -92,6 +85,9 @@ class Symreg:
 		self.init_population()
 	
 	def init_population(self) -> None:
+		"""
+		Initilize population generating random trees.
+		"""
 		x = self.problem.x_train
 		y = self.problem.y_train
 
@@ -104,41 +100,35 @@ class Symreg:
 			for _ in range(self.POPULATION_SIZE):
 				self.population.append(t.Tree(x, y, INIT_METHOD=self.POP_INIT_METHOD))
 	
-	#tournament selection without replacement (try with replacement)
 	def _parent_selection(self, population : list[t.Tree]):
+		"""
+		Simple tournament-based parent selection.
+		"""
 		tournament_contestants = random.sample(population, self.TOURNAMENT_SIZE) 
 		best_candidate : t.Tree = max(tournament_contestants, key=lambda x: x._fitness) 
-		return best_candidate##.deep_copy()
+		return best_candidate
  	
 	def _mutation(self, individual : t.Tree) -> t.Tree:
 		"""
-		Select and apply a mutation to an individual
-
-		:param individual:
-		:type individual: t.Tree
-
-		:param mut_type: The mutation used on the individual 
-		:type mut_type: MUTATION(enum)
-
-		:param use_random_mutation_type: If true ignore the mut_type and select<br/>randomly a mutation type with eaven<br/>probability.
-		:type use_random_mutation_type: bool
+		Select and apply a choosen mutation to an individual.
 		"""
 
 		mut_type = self.MUTATION_TYPE
 
-		# guard from bloat
 		if individual._h < 2:
+			# if the tree is too small try expanding the tree
 			individual = t.expansion_mutation(individual)
 			return individual
-		elif individual._h >=4:
+		elif individual._h >= 4:
+			# if the tree is too deep try reducing its size
 			individual = t.hoist_mutation(individual)
 			return individual
 
 		if self.USE_RAND_MUT_TYPE:
-			# select random mutation type
+			# randomize mutation type
 			mut_type = random.choice(list(self.MUTATION))
 
-		# select mutation type
+		# select mutation
 		match mut_type:
 			case self.MUTATION.SUBTREE:
 				individual = t.subtree_mutation(individual)
@@ -158,7 +148,8 @@ class Symreg:
 
 	def _step(self, population : list[t.Tree]) -> None:
 		"""
-		Use hyper modern approach
+		Use hyper modern approach for generating the offspring by randomly choosig whether to use mutation or recombination.<br/>
+		Then extend the current population using a given population model.
 		"""
 		offspring : list[t.Tree] = list()
 
@@ -176,60 +167,82 @@ class Symreg:
 				o : t.Tree = t.recombination(p1, p2)
 			
 			offspring.append(o)
-				
+		
+		# update offspring fitenss
 		for child in offspring:
 			child._fitness = child.fitness
 		
+		# select population model and extend population
 		match self.POP_MODEL:
 			case self.POPULATION_MODEL.STEADY_STATE, default:
 				population.extend(offspring)
 				population.sort(key=lambda i : i._fitness, reverse=False)
 			case self.POPULATION_MODEL.GENERATIONAL:
 				population = sorted(offspring, key=lambda i : i._fitness, reverse=False)
-			
+		
+		# resize population to max population
 		population = population[:self.POPULATION_SIZE]
 
 		return population
 	
 	def train(self) -> None:
+		"""
+		Uses a genetic programming algorithm to estimate a mathematical function that can solve a symbolic regression problem.
+		"""
+
+		# initialize population and solution
 		current_population : list[t.Tree] = self.population
-		best_solution : t.Tree = current_population[0]
-		
+		best_solution : t.Tree = current_population[0]		
 		last_fitness : float = 0
 		steady_counter : int = 0
 
 		self.history.append(max(current_population, key= lambda x: x._fitness)._fitness)
 
 		for i in range(self.MAX_GENERATIONS):
+			# tweak current solution
 			current_population = self._step(current_population)
 			
+			# get the best tree from current population
 			current_solution = max(current_population, key= lambda x: x._fitness)
 			
+			# append fitness value
 			self.history.append(current_solution._fitness)
 			
+			# update best solution
 			if best_solution._fitness < current_solution._fitness:
 				best_solution = current_solution.deep_copy()
 			
+			# every 50 iterations
 			if i % 50 == 0:
+				# checks if the best solution remained unchanged
 				if best_solution._fitness == last_fitness:
 					steady_counter += 1
 					if steady_counter > 3:
+						# increase mutation probability
 						self.MUTATION_PROBABILITY += 0.05
 						if self.MUTATION_PROBABILITY > 1:
 							self.MUTATION_PROBABILITY = 1
 					if steady_counter > 6:
+						# if it takes too long for improving then stop early
 						break
 				else:
 					# reset
 					last_fitness = best_solution._fitness
 					self.MUTATION_PROBABILITY = 0.05
 					steady_counter = 0
+				
+				# print intermediate state
 				print(f"STEP [{i}/{self.MAX_GENERATIONS}] || fitness : {best_solution._fitness} || {best_solution._root.long_name}")
 		
 		self.history.append(best_solution._fitness)
+		
+		# save the solution
 		self.problem.solution = best_solution
 	
 	def plot_history(self) -> None:
+		"""
+		Plot the current history. Usually history starts empty and get filled up during training.
+		"""
 		plt.close('all')
 		plt.figure(figsize=(8, 6))
 		plt.plot(

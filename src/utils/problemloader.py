@@ -9,7 +9,20 @@ import os
 import numpy as np
 
 class Problem:
-    """Problem container for easly handle input data."""
+    """ Problem container to easly handle input data.<br/>
+        Takes a path to a .npz file and loads the data into the object.
+        
+        Parameters
+        ---
+        path : `str`
+            Path to the .npz file.
+        id : `int`
+            Problem ID.
+        split : `bool`
+            Wether to split or not the dataset in training and validation.
+        ratio : `int`
+            Percentage of the dataset to allocate for validation. The rest will be used training.
+        """
     problem_id : int
 
     use_validation_set : bool
@@ -24,22 +37,7 @@ class Problem:
 
     solution : str
 
-    def __init__(self, path : str, id : int = -1, split : bool = False, ratio : int = 10):
-        
-        """ Takes a path to a .npz file and loads the data into the object.
-        
-        Parameters
-        ---
-        path : `str`
-            Path to the .npz file.
-        id : `int`
-            Problem ID.
-        split : `bool`
-            Wether to split or not the dataset in training and validation.
-        ratio : `int`
-            Percentage of the dataset to allocate for validation. The rest will be used training.
-        """
-        
+    def __init__(self, path : str, id : int = -1, split : bool = False, ratio : int = 10):        
         self.problem_id = id
         self.solution = ""
 
@@ -80,7 +78,6 @@ class ProblemList:
     problems : list[Problem]
 
     def __init__(self) -> None:
-        """Constructor"""
         self.problems = list()
     
     def load_from_path(self, path : str, count : int, split : bool = False, ratio : int = 10) -> None:

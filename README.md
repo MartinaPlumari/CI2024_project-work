@@ -93,7 +93,10 @@ In this project, we developed a dedicated class, `Symreg`, to manage the entire 
 
 ### Optimization process
 
-We implemented a genetic programming approach for the optimization process. The algorithm begins by generating a population of randomly created formulas, each representing a potential relationship between the known independent variables (`x[i]`) and the corresponding result (`y`). The goal is to evolve these formulas over time to produce increasingly accurate results. In each generation, the fittest individuals are selected based on their performance, and genetic operations, such as mutation or recombination, are applied to create a new population, refining the solutions.
+We implemented a genetic programming approach for the optimization process. The algorithm begins by generating a population of randomly created formulas, each representing a potential relationship between the known independent variables (`x[i]`) and the corresponding result (`y`). The goal is to evolve these formulas over time to produce increasingly accurate results. In each generation, the fittest individuals are selected based on their performance, and genetic operations, such as mutation or recombination, are applied to create a new population, refining the solutions. 
+
+For the generation of the initial population, we played around with **full**, **grow** and **half-half** methods, but we found that the **full** method worked best in terms of results. However, we left the option to choose the preferred method to the user.
+  
 
 ### Hyper-Modern Approach
 
@@ -144,3 +147,4 @@ elif individual._h >= 4:
 parlare del fatto che non abbiamo provato altre strategie oltre hyper modern
 
 ## Credits
+

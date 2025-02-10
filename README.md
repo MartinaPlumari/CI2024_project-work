@@ -21,7 +21,7 @@
 		- [Guard System to Prevent Bloating](#guard-system-to-prevent-bloating)
 	- [Settings](#settings)
 	- [Results](#results)
-	- [Conclusions](#conclusions)
+	- [Conclusions and Future Work](#conclusions-and-future-work)
 	- [Credits](#credits)
 
 ## Introduction
@@ -73,6 +73,12 @@ The ```__call__``` method recursively evaluates the node and its children, ensur
 
 These safeguards prevent numerical instability during evaluation.
 
+Even if the node could store any callable function, this implementation is limited to numpy functions. 
+In particular, the following functions are supported: 
+
+* ```np.add```, ```np.subtract```, ```np.multiply```, ```np.divide```, ```np.sqrt```, ```np.log```
+* ```np.tan```, ```np.sin```, ```np.cos```
+
 ### Tree
 
 The ```Tree``` class represents the syntax tree and acts as a container for the entire expression. The object contains a reference to the root node and keeps track of the depth of the tree and the total number of its nodes. Also the fitness (MSE) is stored in the tree object.
@@ -97,8 +103,6 @@ In this project, we developed a dedicated class, `Symreg`, to manage the entire 
 We implemented a genetic programming approach for the optimization process. The algorithm begins by generating a population of randomly created formulas, each representing a potential relationship between the known independent variables (`x[i]`) and the corresponding result (`y`). The goal is to evolve these formulas over time to produce increasingly accurate results. In each generation, the fittest individuals are selected based on their performance, and genetic operations, such as mutation or recombination, are applied to create a new population, refining the solutions. 
 
 For the generation of the initial population, we played around with **full**, **grow** and **half-half** methods, but we found that the **full** method worked best in terms of results. However, we left the option to choose the preferred method to the user.
-  
-
 ### Hyper-Modern Approach
 
 We adopted a hyper-modern approach for adjusting the population. At each step, while generating offspring, there is a specified probability to mutate an individual or perform recombination between two parents, but not both at the same time.
@@ -143,7 +147,7 @@ elif individual._h >= 4:
 
 ## Settings
 
-These are our configurations of the model related to the following results. You can run the code shown earlier to use this settings.
+These are our configurations of the model related to the following results. You can run the code shown earlier to use these settings.
 
 | Setting                      | Value |
 |------------------------------|-------|
@@ -169,9 +173,18 @@ These are our configurations of the model related to the following results. You 
 | 7         | -582.14875          |
 | 8         | -8981174.25265      |
 
-## Conclusions
+As we can see, the algorithm was able to find a good solution for most of the small problems. The algorithm is able to find a good solution within relatively few generations, and the dynamic mutation probability helps to prevent stagnation and improve the results.
+An additional note is that the algorithm is able to find a good solution even with a relatively small population size, which can be beneficial in terms of computational resources.
 
-parlare del fatto che non abbiamo provato altre strategie oltre hyper modern
+## Conclusions and Future Work
+
+This project successfully implemented a Genetic Programming (GP) algorithm for symbolic regression, demonstrating its effectiveness in evolving mathematical expressions to fit given datasets.
+
+The algorithm generally worked well, optimizing mathematical expressions and delivering solid results on many test cases. However, it’s worth noting that in some tests the fitness trend suggested that a solution might not be achievable, like in the case of Problem 2.
+Despite the strong performance on smaller problems, challenges remain with more complex expressions and larger datasets, suggesting that scalability might be a problem.
+
+That being said, we only focused on the hyper-modern strategy and didn’t try out other alternatives. In the future, it might be worthwhile to explore different techniques: like alternative crossover and selection methods or improved elitism strategies. 
+
 
 ## Credits
 

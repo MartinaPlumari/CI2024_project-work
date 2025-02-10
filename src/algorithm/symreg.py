@@ -82,6 +82,7 @@ class Symreg:
 		self.USE_RAND_MUT_TYPE = use_random_mutation_type
 
 		self.history = list() 
+		self.population = list()
 
 		# extract problem data
 		self.problem = problem

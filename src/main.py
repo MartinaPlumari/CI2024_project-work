@@ -26,7 +26,7 @@ if __name__ == '__main__':
     saver = Saver(opt.out, opt.name, opt.id)
 
     problems : list[Problem] = [pl.problems[i] for i in range(len(pl.problems)) if opt.all or i == opt.index]
-    print([p.problem_id for p in problems])
+    print(problems)
     for i in range(len(problems)):
         print(f"\nStarting problem {problems[i].problem_id}")
         alg : Symreg = Symreg(problem=problems[i], 
@@ -42,6 +42,3 @@ if __name__ == '__main__':
         alg.train()
         print(f"\nRESULT: {alg.problem.solution._root}\nFITNESS: {alg.problem.solution._fitness}\n================================\n")
         saver.append_solution(alg.problem)
-
-    # alg.plot_history()
-    # draw.draw_tree(alg.problem.solution._root)

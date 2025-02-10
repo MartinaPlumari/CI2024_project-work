@@ -19,6 +19,7 @@
 		- [Hyper-Modern Approach](#hyper-modern-approach)
 		- [Dynamic Mutation Probability](#dynamic-mutation-probability)
 		- [Guard System to Prevent Bloating](#guard-system-to-prevent-bloating)
+	- [Settings](#settings)
 	- [Results](#results)
 	- [Conclusions](#conclusions)
 	- [Credits](#credits)
@@ -140,7 +141,33 @@ elif individual._h >= 4:
 	return individual
 ```
 
+## Settings
+
+These are our configurations of the model related to the following results. You can run the code shown earlier to use this settings.
+
+| Setting                      | Value |
+|------------------------------|-------|
+| Population Size              | 5000  |
+| Offspring Size               | 5000  |
+| Max Generations              | 1000  |
+| Use Random Mutations         | True  |
+| Tournament Selection         | 3     |
+| Initial Mutation Probability | 0.05  |
+| Population Initialization    | 1     |
+
 ## Results
+
+| PROBLEM # | BEST RESULT         |
+|-----------|---------------------|
+| 0         | -2.29435e-05        |
+| 1         | -7.62668e-34        |
+| 2         | -29277347609686.277 |
+| 3         | -516.23614          |
+| 4         | -0.32133            |
+| 5         | -5.57281e-18        |
+| 6         | -0.242187           |
+| 7         | -582.14875          |
+| 8         | -8981174.25265      |
 
 ## Conclusions
 

@@ -12,7 +12,7 @@ from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log]#, np.power] #np.exp
+FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
 CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
 MAX_DEPTH = 4
 VARIABLE_P = 0.7
@@ -373,7 +373,9 @@ def simplify_tree(t: Tree) -> Tree:
         if all(child.is_leaf and child._type == 'c' for child in node._successors):
             try:
                 new_value = node()  
-                return Node(new_value)  
+                new_node = Node(new_value)
+                new_node._parent = node._parent
+                return new_node
             except Exception:
                 return node  
         

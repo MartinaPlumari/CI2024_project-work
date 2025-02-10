@@ -7,27 +7,24 @@
 
 import numbers
 import numpy as np
-import random as rnd
 from typing import Callable
 from utils.arity import arity
 import copy
-import json
 
 class Node:
     _function: Callable
     _successors: list['Node']
     _parent: 'Node'
-    _arity: int #questa mi serve per capire come strutturare i successori
-    _str: str #penso sia una sorta di etichetta (stringa) per il nodo
-    _leaf: bool #questo mi serve per capire se il nodo è una foglia
-    _type: str #questo mi serve per capire se il nodo è una variabile, una costante o una funzione
-
+    _arity: int 
+    _str: str 
+    _leaf: bool 
+    _type: str 
 
     def __init__(self, node=None, successors= None, *, name=None):
         
         self._parent = None
         
-        #FIRST CASE: the node is a function (or an operator, the two cases can coincide when using np)
+        #FIRST CASE: the node is a function 
         if callable(node):
             
             def _f (*_args, **_kwargs):
@@ -40,11 +37,6 @@ class Node:
             self._type = 'f'
             self._arity = arity(node)
             self._successors = list(successors) if successors is not None else []
-            
-            # assert self._arity is None or len(self._successors) == self._arity, (
-            #     "Panic: Incorrect number of children."
-            #     + f" Expected {len(tuple(successors))} found {arity(node)}"
-            # )
             
             self._leaf = False
             assert all(isinstance(s, Node) for s in self._successors), "Panic: Successors must be `Node`"
@@ -70,6 +62,7 @@ class Node:
             else:
                 self._str = f'{node:g}' 
             self._leaf = True
+            
         #THIRD CASE: the node is a variable
         elif isinstance(node, str):
             self._function = eval(f'lambda *, {node}, **_kw: {node}')
@@ -81,9 +74,11 @@ class Node:
         else:
             assert False
     
+    #recursively calls the function (solves the expression tree)
     def __call__(self, **kwargs):
         res = self._function(*[c(**kwargs) for c in self._successors], **kwargs)
         
+        #protection against dangerous operations
         if self._parent is not None and (self._parent.short_name == 'np.divide' or self._parent.short_name == 'np.log'):
             if(isinstance(res, np.ndarray)):
                 res[res == 0] = 0.001
@@ -123,61 +118,31 @@ class Node:
     
     def get_successors(self):
         return self._successors
-    
+
 
     def __deepcopy__(self, memo):
-        """Crea una copia profonda del nodo e dei suoi successori."""
+        """Creates a deep copy of the current node."""
         if id(self) in memo:
             return memo[id(self)]
         
-        # Creiamo un nuovo nodo in base al tipo
-        if self._type == 'c':  # Costante
+        # Creation of the new node based on the type
+        if self._type == 'c': 
             copied_node = Node(float(self._str))
             return copied_node
-        elif self._type == 'v':  # Variabile
+        elif self._type == 'v': 
             copied_node = Node(self._str)
             return copied_node
-        else:  # Funzione
-            copied_node = Node(eval(self.short_name), successors=[], name=self._str)  # Mantiene il nome
+        else:  
+            copied_node = Node(eval(self.short_name), successors=[], name=self._str)
         
-        # Copiamo gli attributi fondamentali
-        # copied_node._arity = self._arity
-        # copied_node._type = self._type
-        # copied_node._leaf = self._leaf
-        # copied_node._str = self._str
-        # copied_node._parent = None  # La parent verrà aggiornata in seguito
-        
-        # Copia ricorsiva dei successori
+        # Recursively copy the successors
         copied_node._successors = [copy.deepcopy(s, memo) for s in self._successors]
         
-        # Aggiorniamo i riferimenti al parent nei successori copiati
+        # Update the parent for the new successors
         for child in copied_node._successors:
             child._parent = copied_node
-        
-        # Memorizziamo la copia nel memo per evitare duplicazioni
-        memo[id(self)] = copied_node
-        return copied_node
-    
-    def copy(self):
-        # Crea una copia del nodo corrente senza parent e successori
 
-        if self._function is None:
-            return None
+        # Save the new node in the memo
+        memo[id(self)] = copied_node
         
-        new_node = Node(
-            node=self._function, 
-            successors=[], 
-            name=self._str
-        )
-        new_node._type = self._type
-        new_node._arity = self._arity
-        new_node._leaf = self._leaf
-        
-        # Copia i successori ricorsivamente
-        new_node._successors = [child.copy() for child in self._successors]
-        
-        # Imposta il parent per i nuovi successori
-        for child in new_node._successors:
-            child._parent = new_node
-        
-        return new_node
+        return copied_node

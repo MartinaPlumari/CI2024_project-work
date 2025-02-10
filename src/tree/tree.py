@@ -7,20 +7,19 @@
 
 import numpy as np
 import random as rnd
-from enum import Enum 
 from tree.node import Node
 from utils.arity import arity
 import copy
 
-FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log] #np.exp
-CONSTANT_RANGE = (-10, 10) #could be an eccessive limitation
+FUNCTIONS = [np.add, np.subtract, np.multiply, np.divide, np.tan, np.sin, np.cos, np.sqrt, np.log]
+CONSTANT_RANGE = (-10, 10)
 MAX_DEPTH = 4
 VARIABLE_P = 0.7
-EARLY_STOP_P = 0.0
+EARLY_STOP_P = 0.05
 
 class Tree:
     """
-    TODO
+    Class representing a syntax tree for symbolic regression.
     """
     
     _root: Node
@@ -31,6 +30,10 @@ class Tree:
     _fitness: float
      
     def __init__(self, x: np.ndarray, y: np.ndarray, INIT_METHOD: int = 0, depth: int = MAX_DEPTH):   
+        """
+        Initializes a new tree with random structure and constants.
+        """
+        
         self._root = Node('nan')
         self._n = 0
         self._x = x
@@ -51,20 +54,15 @@ class Tree:
     
     def __call__(self):
         return self._root(**self._kwargs)
-    
-    @property
-    def subtree(self):
-         result = set()
-         _get_subtree(result, self)
-         return result   
         
-    #cumulative fitness on all the dataset
     @property
-    def fitness(self) -> float:        
+    def fitness(self) -> float:       
+        """Calculates the fitness of the tree on the dataset.""" 
         t = np.nan_to_num(self._root(**self._kwargs), nan = -10)
         return - np.mean((t - self._y) ** 2)
-    
+
     def get_node(self, n: list, node: Node = None) -> Node:
+        """Recursively retrieves a node from the tree given its index."""
         if node is None:
             node = self._root
         
@@ -81,6 +79,7 @@ class Tree:
         return None
     
     def deep_copy(self) -> 'Tree':
+        """Creates a deep copy of the current tree."""
         new_tree = Tree(self._x, self._y)
         new_tree._root = copy.deepcopy(self._root)
         new_tree._n = self._n
@@ -88,17 +87,12 @@ class Tree:
         new_tree._fitness = self._fitness
         new_tree._kwargs = self._kwargs
         return new_tree
-       
-    
-def _get_subtree(bunch: set, node: Node):
-    bunch.add(node)
-    for c in node._successors:
-        _get_subtree(bunch, c) 
+        
     
 def get_tree_height(node: Node) -> int: 
     """Recursively calculates the height of a given tree."""
     if node.is_leaf:
-        return 1  # Leaf nodes have height 1
+        return 1 
     
     return 1 + max(get_tree_height(child) for child in node.get_successors())
 
@@ -106,35 +100,36 @@ def count_nodes(node):
     """Recursively counts the total number of nodes in the tree."""
     return 1 + sum(count_nodes(child) for child in node.get_successors())
 
-#problema, spesso escono valori nan o errori (divide by 0, log di numeri negativi, ecc)
+
 def create_random_tree(vars, depth = 0, max_depth = MAX_DEPTH, mode: int = 0) -> tuple[Node, int]:
-    """Recursively creates a random syntax tree"""
+    """Recursively creates a random syntax tree. Returns the root node and the total number of nodes."""
     
     node_count = 1
     
-    # Base case: If max depth is reached, return a leaf node (constant or variable)
+    #If max depth is reached, return a leaf node (constant or variable)
     #if grow is selected as a mode, we have a chance of stopping early
     if depth >= max_depth or (mode == 0 and rnd.random() < EARLY_STOP_P):  
-        # Random variable
+        # Leaf node: Randomly choose between variable and constant
         if rnd.random() < VARIABLE_P:
             return Node(rnd.choice(vars)), node_count  
-        # Random constant
         else:
             return Node(rnd.uniform(*CONSTANT_RANGE)), node_count  
     
-    # Recursive case: Create a function node
-    func = rnd.choice(FUNCTIONS)  # Choose a random function/operator
-    ar = arity(func)  # Get function arity
+    # If not a leaf, create a function node
+    func = rnd.choice(FUNCTIONS)  
+    ar = arity(func)  
     
     successors = []
     for _ in range(ar):
         child, child_count = create_random_tree(vars, depth + 1, max_depth)
         successors.append(child)
-        node_count += child_count  # Accumulate total nodes created
+        node_count += child_count 
     
     return Node(func, successors), node_count
 
 def recombination(t1: Tree, t2: Tree) -> Tree:
+    """Performs a recombination between two trees by swapping random subtrees."""
+    
     if t1._n < 2 or t2._n < 2:
         return
     
@@ -142,15 +137,14 @@ def recombination(t1: Tree, t2: Tree) -> Tree:
     n1 : Node = rnd.randint(1, t1._n - 1)  
     node1 = t1.get_node([n1])
     
-    # get random node from t1
     while node1 is None or node1._parent is None:
         n1 = rnd.randint(1, t1._n - 1)
         node1 = t1.get_node([n1])
     
+    #get random node from t2
     n2 : Node = rnd.randint(1, t2._n-1)
     node2 = t2.get_node([n2])
     
-    #get random node from t2
     while node2 is None:
         n2 = rnd.randint(1, t2._n - 1)
         node2 = t2.get_node([n2])
@@ -171,48 +165,8 @@ def recombination(t1: Tree, t2: Tree) -> Tree:
 
     return t1
 
-    
-
-def crossover(t1: Tree, t2: Tree) -> Tree:
-    """ Performs a crossover operation between two trees by taking a subtree from the second one and replacing a subtree in the first one."""
-    t = t1.deep_copy()
-    
-    if t1._n < 2:
-        return t
-
-    # Select a random node from t1 (excluding the root)
-    n1 = rnd.randint(1, t._n - 1)  
-    node1 = t.get_node([n1])
-    
-    while node1 is None or node1._parent is None:
-        n1 = rnd.randint(1, t._n - 1)
-        node1 = t.get_node([n1])
-    
-    n2 = rnd.randint(0, t2._n-1)
-    node2 = t2.get_node([n2])
-    
-    while node2 is None:
-        n2 = rnd.randint(0, t2._n - 1)
-        node2 = t2.get_node([n2])
-    
-    new_subtree = copy.deepcopy(node2)
-    parent = node1._parent
-    
-    if parent is not None:
-        new_subtree._parent = parent
-        parent._successors[parent._successors.index(node1)] = new_subtree
-    else:
-        t = t1.deep_copy()
-        t._root = new_subtree
-    
-    t._h = get_tree_height(t._root)
-    t._n = count_nodes(t._root)
-    
-    
-    return t
-
 def point_mutation(t: Tree) -> Tree:
-    """Performs a mutation by replacing a function node with a different random function."""
+    """Performs a mutation by replacing a function node with a different random function with the same arity."""
     
     if t._n < 2:
         return t
@@ -238,7 +192,7 @@ def point_mutation(t: Tree) -> Tree:
     return t
 
 def permutation_mutation(t: Tree) -> Tree:
-    """Exchanges two lives in the tree"""
+    """Exchanges two random subtrees in the tree."""
     
     if t._n < 3:
         return t
@@ -286,7 +240,7 @@ def collapse_mutation(t: Tree) -> Tree:
     n = rnd.randint(1, t._n-1)
     node = t.get_node([n])
     
-    while node is None or node.is_leaf or node._parent is None:# or node.short_name == 'np.absolute':
+    while node is None or node.is_leaf or node._parent is None:
         n = rnd.randint(1, t._n-1)
         node = t.get_node([n])
     
@@ -296,7 +250,6 @@ def collapse_mutation(t: Tree) -> Tree:
     
     if rnd.random() < VARIABLE_P:
         new_node = Node(rnd.choice(var)) 
-        # Random constant
     else:
         new_node = Node(rnd.uniform(*CONSTANT_RANGE))
         
@@ -310,7 +263,7 @@ def collapse_mutation(t: Tree) -> Tree:
     return t
 
 def subtree_mutation(t: Tree) -> Tree:
-    """Performs a subtree mutation by replacing a subtree with a one of its subtree."""
+    """Performs a subtree mutation by replacing a subtree with one of its subtrees."""
     
     if t._n < 4:
         return t

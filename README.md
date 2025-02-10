@@ -32,7 +32,7 @@ The model is fully customizable and allow changing multiple settings **directly 
 For more informations use:
 
 ```
-python.exe .\Main.py --help
+python.exe .\main.py --help
 ```
 
 To start a trainig session with the **pre-configured settings** use:

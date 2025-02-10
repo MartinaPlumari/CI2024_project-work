@@ -81,17 +81,17 @@ class Node:
         #protection against dangerous operations
         if self._parent is not None and (self._parent.short_name == 'np.divide' or self._parent.short_name == 'np.log'):
             if(isinstance(res, np.ndarray)):
-                res[res == 0] = 0.001
+                res[res == 0] = 1e-6
             else:
                 if res == 0:
-                    res = 0.001
+                    res = 1e-6
         elif self._parent is not None and (self._parent.short_name == 'np.log' and self._parent.short_name == 'np.sqrt'):
             res[res < 0] = abs(res)
             if(isinstance(res, np.ndarray)):
-                res[res == 0] = 0.001
+                res[res == 0] = 1e-6
             else:
                 if res == 0:
-                    res = 0.001
+                    res = 1e-6
         return res
         
         

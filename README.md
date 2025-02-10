@@ -25,9 +25,13 @@
 
 ## Introduction
 
+In this project, we developed a Genetic Programming (GP) algorithm for symbolic regression, using evolutionary techniques to iteratively optimize mathematical expressions. 
+The algorithm begins with a population of randomly generated expressions and improves them over generations through **mutation**, **crossover**, and **selection**.
+
+
 ## Features
 
-The model is fully customizable and allow changing multiple settings **directly from the command line** (es. dataset path, population size, etc...).
+The model is fully customizable and allows changing multiple settings **directly from the command line** (es. dataset path, population size, etc...).
 
 For more informations use:
 

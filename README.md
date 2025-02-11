@@ -34,13 +34,13 @@ The algorithm begins with a population of randomly generated expressions and imp
 
 The model is fully customizable and allows changing multiple settings **directly from the command line** (es. dataset path, population size, etc...).
 
-For more informations use:
+For more information use:
 
 ```
 python.exe .\main.py --help
 ```
 
-To start a trainig session with the **pre-configured settings** use:
+To start a training session with the **pre-configured settings** use:
 
 ```
 python.exe .\main.py --dset "<path-to-dataset>" --name "<name-surname>" --id "<student-id>"
@@ -61,9 +61,9 @@ The Genetic Programming algorithm relies on two primary data structures:
 
 Each ```Node``` object of this class can represent either a mathematical operator, a variable or a constant. 
 
-Each node mantains references to its parent and to its children, allowing for easy tree traversal.
+Each node maintains references to its parent and to its children, allowing for easy tree traversal.
 
-The ```__call__``` method recursively evaluates the node and its children, ensuring correct computation. To prevent errors from invalid mathematical operations, protective checks are applied:
+The ```__call__``` method recursively evaluates the node and its children, ensuring correct computation. To prevent errors from invalid mathematical operations, protective checks are implemented:
 
 * **Division** (```np.div```): if the denominator is zero, it is replaced with 1e-6 to avoid division by zero.
 * **Logarithm** (```np.log```): 
@@ -73,7 +73,7 @@ The ```__call__``` method recursively evaluates the node and its children, ensur
 
 These safeguards prevent numerical instability during evaluation.
 
-Even if the node could store any callable function, this implementation is limited to numpy functions. 
+Even if the node could store any callable function, this implementation is limited to NumPy functions. 
 In particular, the following functions are supported: 
 
 * ```np.add```, ```np.subtract```, ```np.multiply```, ```np.divide```, ```np.sqrt```, ```np.log```
@@ -102,7 +102,7 @@ In this project, we developed a dedicated class, `Symreg`, to manage the entire 
 
 We implemented a genetic programming approach for the optimization process. The algorithm begins by generating a population of randomly created formulas, each representing a potential relationship between the known independent variables (`x[i]`) and the corresponding result (`y`). The goal is to evolve these formulas over time to produce increasingly accurate results. In each generation, the fittest individuals are selected based on their performance, and genetic operations, such as mutation or recombination, are applied to create a new population, refining the solutions. 
 
-For the generation of the initial population, we played around with **full**, **grow** and **half-half** methods, but we found that the **full** method worked best in terms of results. However, we left the option to choose the preferred method to the user.
+For the generation of the initial population, we experimented with **full**, **grow** and **half-half** methods, but we found that the **full** method worked best in terms of results. However, we left the option to choose the preferred method to the user.
 ### Hyper-Modern Approach
 
 We adopted a hyper-modern approach for adjusting the population. At each step, while generating offspring, there is a specified probability to mutate an individual or perform recombination between two parents, but not both at the same time.
@@ -120,9 +120,9 @@ To further enhance the optimization, we implemented a dynamic adjustment of muta
 ...
 # every 50 iterations
 if i % 50 == 0:
-	checks if the best solution remained unchanged for long enough
+	checks if the best solution has remained unchanged for long enough
 		then increase mutation probability by 0.05
-	if it takes too long for improving 
+	if it takes too long to improve 
 		then stop early
 else:
 	reset mutation probability to 0.05
@@ -183,8 +183,7 @@ This project successfully implemented a Genetic Programming (GP) algorithm for s
 The algorithm generally worked well, optimizing mathematical expressions and delivering solid results on many test cases. However, it’s worth noting that in some tests the fitness trend suggested that a solution might not be achievable, like in the case of Problem 2.
 Despite the strong performance on smaller problems, challenges remain with more complex expressions and larger datasets, suggesting that scalability might be a problem.
 
-That being said, we only focused on the hyper-modern strategy and didn’t try out other alternatives. In the future, it might be worthwhile to explore different techniques: like alternative crossover and selection methods or improved elitism strategies. 
-
+That being said, we focused only on the hyper-modern strategy and did not explore other alternatives. In the future, it might be worthwhile to explore different techniques: such as alternative crossover and selection methods or improved elitism strategies.
 
 ## Credits
 

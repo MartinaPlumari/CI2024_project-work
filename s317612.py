@@ -1,5 +1,5 @@
 # CI 2024 final project
-# Student None
+# Student Martina Plumari
 # ID s317612
 
 import numpy as np

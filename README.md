@@ -1,6 +1,6 @@
 # CI2024_project-work - Genetic Programming Algorithm for Symbolic Regression
 
-> ⚠️`DISCLAMER`⚠️: this project and so all the code and applied strategies were made by a team of 2 people:
+> ⚠️`DISCLAIMER`⚠️: this project and so all the code and applied strategies were made by a team of 2 people:
 >
 > - Martina Plumari (s317612)
 > - Daniel Bologna (s310582)
